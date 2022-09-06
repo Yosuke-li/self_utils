@@ -101,8 +101,7 @@ class _RefreshState extends State<Refresh> {
                   });
 
                   return Center(
-                    child: RaisedButton(
-                      color: const Color(0xffeeeeee),
+                    child: ElevatedButton(
                       onPressed: () {
                         setState(() {
                           asyncMemoizer = AsyncMemoizer();

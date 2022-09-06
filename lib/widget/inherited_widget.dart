@@ -62,7 +62,7 @@ class _InheritedShowState extends State<InheritedShowPage> {
                   padding: const EdgeInsets.only(bottom: 20.0),
                   child: _TextInheritedWidget(),
                 ),
-                RaisedButton(
+                ElevatedButton(
                   onPressed: () {
                     count++;
                     setState(() {});
