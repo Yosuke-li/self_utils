@@ -8,7 +8,7 @@ import 'package:self_utils/utils/file_utils.dart';
 import 'package:self_utils/utils/network_file_util/network_file_util.dart';
 import 'package:self_utils/utils/permission/check_permission.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:ios_share/ios_share.dart';
+// import 'package:ios_share/ios_share.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileToLocateHelper {
@@ -43,8 +43,8 @@ class FileToLocateHelper {
           onSuccessToast?.call(file1.path);
         }
       } else {
-        //ios
-        IosShare.iosShareHelper(file1.absolute.path);
+        //todo ios
+        // IosShare.iosShareHelper(file1.absolute.path);
       }
     } catch (e, s) {
       rethrow;
