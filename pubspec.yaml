@@ -20,7 +20,7 @@ dependencies:
   path_provider: ^2.0.1
   package_info: ^2.0.2 #包信息
   sentry: ^5.0.0  #日志监听
-  image_gallery_saver: ^1.2.2 #文件保存
+  image_gallery_saver: ^1.7.1 #文件保存
 #  ios_share:
 #    git:
 #      url: https://github.com/NayoLx/ios_share.git

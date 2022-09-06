@@ -38,13 +38,8 @@ class FileToLocateHelper {
       }
 
       final File file1 = await file.writeAsBytes(bytes);
-      if (Platform.isAndroid) {
-        if (file1.existsSync()) {
-          onSuccessToast?.call(file1.path);
-        }
-      } else {
-        //todo ios
-        // IosShare.iosShareHelper(file1.absolute.path);
+      if (file1.existsSync()) {
+        onSuccessToast?.call(file1.path);
       }
     } catch (e, s) {
       rethrow;
@@ -74,7 +69,9 @@ class FileToLocateHelper {
         final File file = await _createFileWithType('webp');
         byte ??= await File(fileUrl!).readAsBytes();
         final File file1 = await file.writeAsBytes(byte);
-
+        if (file1.existsSync()) {
+          onSuccessToast?.call();
+        }
       }
     } catch (e, s) {
       rethrow;
@@ -86,10 +83,10 @@ class FileToLocateHelper {
     String filePath;
     if (Platform.isAndroid) {
       final Directory? dir = await getExternalStorageDirectory();
-      filePath = (dir?.path ?? '') + '$fileName';
+      filePath = '${dir?.path ?? ''}$fileName';
     } else {
       final Directory tempDir = await getTemporaryDirectory();
-      filePath = tempDir.path + '$fileName';
+      filePath = '${tempDir.path}$fileName';
     }
 
     final File file = File(filePath);
@@ -105,7 +102,7 @@ class FileToLocateHelper {
     String filePath;
     if (Platform.isAndroid) {
       final Directory? dir = await getExternalStorageDirectory();
-      filePath = (dir?.path ?? '') + '${Random().nextInt(4294967000)}' + ('.$fileType');
+      filePath = '${dir?.path ?? ''}${Random().nextInt(4294967000)}.$fileType';
     } else {
       filePath = await FileUtils.generateRandomTempFilePath(fileType: fileType);
     }
