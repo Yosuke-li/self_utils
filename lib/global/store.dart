@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:self_utils/utils/array_helper.dart';
 import 'package:self_utils/utils/log_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,14 +25,15 @@ class LocateStorage {
   }
 
   //查看所有keys
-  static void getAllKey() {
+  static Set<String> getAllKey() {
     final keys = lStorage.getKeys();
+    return keys;
   }
 
   //查看keys 仅用于缓存一段时间
   static String? getOneKey(String key) {
     final keys = lStorage.getKeys();
-    if (keys != null && keys.isNotEmpty == true) {
+    if (keys.isNotEmpty == true) {
       String hasKey = keys.firstWhere((element) => element.contains('$key '), orElse: () => '');
       if (hasKey.isNotEmpty == true) {
         List<String> keyWithTime = hasKey.split(' ');
@@ -53,37 +51,37 @@ class LocateStorage {
 
   //设置String缓存
   static void setString(String key, String val) {
-    lStorage.setString('$key', val);
+    lStorage.setString(key, val);
     Log.info('setString: $key');
   }
 
   //获取String缓存
   static String? getString(String key) {
-    final value = lStorage.getString('$key');
+    final value = lStorage.getString(key);
     return value;
   }
 
   //设置bool缓存
   static void setBool(String key, bool val) {
-    lStorage.setBool('$key', val);
+    lStorage.setBool(key, val);
     Log.info('setBool: $key');
   }
 
   //获取bool缓存
   static bool? getBool(String key) {
-    final value = lStorage.getBool('$key');
+    final value = lStorage.getBool(key);
     return value;
   }
 
   //设置int缓存
   static void setInt(String key, int val) {
-    lStorage.setInt('$key', val);
+    lStorage.setInt(key, val);
     Log.info('setInt: $key');
   }
 
   //获取int缓存
   static int? getInt(String key) {
-    final value = lStorage.getInt('$key');
+    final value = lStorage.getInt(key);
     return value;
   }
 
@@ -119,7 +117,7 @@ class LocateStorage {
   static String? getStringWithExpire(String key) {
     final hasKey = getOneKey(key);
     if (hasKey != null) {
-      final value = lStorage.getString('$hasKey');
+      final value = lStorage.getString(hasKey);
       return value;
     } else {
       return null;
@@ -141,7 +139,7 @@ class LocateStorage {
   static bool? getBoolWithExpire(String key) {
     final hasKey = getOneKey(key);
     if (hasKey != null) {
-      final value = lStorage.getBool('$hasKey');
+      final value = lStorage.getBool(hasKey);
       return value;
     } else {
       return null;
@@ -163,7 +161,7 @@ class LocateStorage {
   static int? getIntWithExpire(String key) {
     final hasKey = getOneKey(key);
     if (hasKey != null) {
-      final value = lStorage.getInt('$hasKey');
+      final value = lStorage.getInt(hasKey);
       return value;
     } else {
       return null;

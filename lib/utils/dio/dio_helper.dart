@@ -4,7 +4,6 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:self_utils/global/global.dart';
 import 'package:self_utils/utils/api_exception.dart';
 import 'package:self_utils/utils/toast_utils.dart';
 
@@ -82,19 +81,14 @@ class Request {
     switch (error.type) {
       case DioErrorType.connectTimeout:
         return '网络连接超时，请检查网络设置';
-        break;
       case DioErrorType.receiveTimeout:
         return '服务器异常，请稍后重试！';
-        break;
       case DioErrorType.sendTimeout:
         return '网络连接超时，请检查网络设置';
-        break;
       case DioErrorType.response:
         return '服务器异常，请稍后重试！';
-        break;
       case DioErrorType.cancel:
         return '请求已被取消，请重新请求';
-        break;
       default:
         return "Dio异常";
     }
