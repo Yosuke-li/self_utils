@@ -36,6 +36,7 @@ export 'utils/navigator.dart';
 export 'utils/permission.dart';
 export 'utils/screen.dart';
 export 'utils/shortcuts/shortcuts.dart';
+export 'utils/shortcuts/shortcuts_model.dart';
 export 'utils/singleton.dart';
 export 'utils/test.dart';
 export 'utils/text_formatter.dart';
