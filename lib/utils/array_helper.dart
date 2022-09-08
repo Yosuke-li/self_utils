@@ -18,17 +18,16 @@ class ArrayHelper {
   static List<T> unique<T>(
       {required List<T> listData, required dynamic Function(T value) getKey}) {
     if (listData.isNotEmpty == true) {
-      final Map<dynamic, List<T>> maps = Map<dynamic, List<T>>.fromIterable(
-          listData,
-          key: (dynamic key) => getKey(key as T),
-          value: (dynamic item) => listData
-              .where((T element) => getKey(element) == getKey(item))
-              .toList());
-      final List<T> list = maps.values
-          .map((List<T> e) => e.first)
-          .toList();
+      final Map<dynamic, List<T>> maps = {
+        for (var e in listData)
+          getKey(e): listData
+              .where((T element) => getKey(element) == getKey(e))
+              .toList()
+      };
+      final List<T> list = maps.values.map((List<T> e) => e.first).toList();
       return list..removeWhere((T? element) => element == null);
-    } else
+    } else {
       return <T>[];
+    }
   }
 }

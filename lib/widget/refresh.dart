@@ -74,7 +74,9 @@ class _RefreshState extends State<Refresh> {
                 final refreshEnum = await widget.canLoadMore?.call(context);
                 if (refreshEnum == null || refreshEnum == RefreshEnum.needMore) {
                   Log.info('需要加载更多');
-                  await widget.loadMoreFunc!(context);
+                  if (mounted) {
+                    await widget.loadMoreFunc!(context);
+                  }
                   Log.info('加载更多完成');
                 } else {
                   Log.info('没调用加载更多方法');

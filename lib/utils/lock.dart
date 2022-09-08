@@ -4,7 +4,7 @@ import 'dart:async';
 class Lock {
   Completer<void>? _completer;
 
-  Future<T> mutex<T>(Future<T> callback()) async {
+  Future<T> mutex<T>(Future<T> Function() callback) async {
     await lock();
     try {
       return await callback();
