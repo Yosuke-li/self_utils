@@ -433,7 +433,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     } else {
       _controller = VideoPlayerController.network(widget.url!);
     }
-    _controller?.addListener(Utils.debounce(_videoListener));
+    _controller?.addListener(() => Utils.debounce(_videoListener));
     await _controller?.initialize();
     _videoInit = true;
     //加载资源完成后 自动播放

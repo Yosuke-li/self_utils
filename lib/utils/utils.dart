@@ -16,6 +16,8 @@ class Utils {
 
   static bool get isIOS => Platform.isIOS;
 
+  static Timer? timer;
+
   /// 字符串转颜色
   ///
   /// [string] 字符串
@@ -45,7 +47,7 @@ class Utils {
   /// [len] 字符串长度
   ///
   static String randomString(int len) {
-    final String character =
+    const String character =
         'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
     String left = '';
     for (var i = 0; i < len; i++) {
@@ -251,18 +253,12 @@ class Utils {
   }
 
   /// 函数防抖
-  static Function() debounce(Function() func, {Duration? delay}) {
+  static void debounce(Function() func, {Duration? delay}) {
     delay ??= const Duration(milliseconds: 3000);
-    Timer? timer;
-    final Function() target = () {
-      if (timer?.isActive ?? false) {
-        timer?.cancel();
-      }
-      timer = Timer(delay!, () {
-        func.call();
-      });
-    };
-    return target;
+    timer?.cancel();
+    timer = Timer(delay, () {
+      func.call();
+    });
   }
 
   static num? getNumByDouble(num? value, int fractionDigits) {
