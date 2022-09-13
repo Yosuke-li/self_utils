@@ -3,8 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-
-
 typedef ViewCallback = void Function(int firstIndex, int lastIndex);
 
 class ScrollListenerWidget extends StatelessWidget {
@@ -18,8 +16,8 @@ class ScrollListenerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
-      child: child,
       onNotification: _onNotification,
+      child: child,
     );
   }
 
