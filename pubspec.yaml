@@ -43,6 +43,7 @@ dependencies:
   simple_animations: ^5.0.0+2
   provider: ^6.0.1 #状态管理
   flutter_shortcuts: ^1.2.2 #app图标长按按钮
+  expandable: ^5.0.1
 
 
 dev_dependencies:
