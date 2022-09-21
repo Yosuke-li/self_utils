@@ -20,14 +20,11 @@ class MarkdownTextInput extends StatefulWidget {
   /// Change the text direction of the input (RTL / LTR)
   final TextDirection? textDirection;
 
-  /// The maximum of lines that can be display in the input
-  final int? maxLines;
-
   /// List of action the component can handle
   final List<MarkdownType> actions;
 
   /// Optionnal controller to manage the input
-  final TextEditingController? controller;
+  final TextEditingController controller;
 
   /// Constructor for [MarkdownTextInput]
   MarkdownTextInput(
@@ -36,7 +33,6 @@ class MarkdownTextInput extends StatefulWidget {
         this.label = '',
         this.validators,
         this.textDirection = TextDirection.ltr,
-        this.maxLines = 10,
         this.actions = const [
           MarkdownType.bold,
           MarkdownType.italic,
@@ -44,18 +40,17 @@ class MarkdownTextInput extends StatefulWidget {
           MarkdownType.link,
           MarkdownType.list
         ],
-        this.controller,
+        required this.controller,
       });
 
   @override
-  _MarkdownTextInputState createState() => _MarkdownTextInputState(controller ?? TextEditingController());
+  _MarkdownTextInputState createState() => _MarkdownTextInputState();
 }
 
 class _MarkdownTextInputState extends State<MarkdownTextInput> {
-  final TextEditingController _controller;
+  late TextEditingController _controller;
   TextSelection textSelection = const TextSelection(baseOffset: 0, extentOffset: 0);
 
-  _MarkdownTextInputState(this._controller);
 
   void onTap(MarkdownType type, {int titleSize = 1}) {
     final basePosition = textSelection.baseOffset;
@@ -75,6 +70,7 @@ class _MarkdownTextInputState extends State<MarkdownTextInput> {
 
   @override
   void initState() {
+    _controller = widget.controller;
     _controller.text = widget.initialValue;
     _controller.addListener(() {
       if (_controller.selection.baseOffset != -1) textSelection = _controller.selection;
@@ -94,34 +90,14 @@ class _MarkdownTextInputState extends State<MarkdownTextInput> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        border: Border.all(color: Theme.of(context).colorScheme.secondary, width: 2),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        border: Border.all(color: Theme.of(context).colorScheme.secondary, width: 1),
       ),
       child: Column(
         children: <Widget>[
-          TextFormField(
-            textInputAction: TextInputAction.newline,
-            maxLines: widget.maxLines,
-            controller: _controller,
-            textCapitalization: TextCapitalization.sentences,
-            validator: (value) => widget.validators!(value),
-            cursorColor: Theme.of(context).primaryColor,
-            textDirection: widget.textDirection,
-            decoration: InputDecoration(
-              enabledBorder:
-              UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary)),
-              focusedBorder:
-              UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary)),
-              hintText: widget.label,
-              hintStyle: const TextStyle(color: Color.fromRGBO(63, 61, 86, 0.5)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-            ),
-          ),
           SizedBox(
             height: 44,
             child: Material(
               color: Theme.of(context).cardColor,
-              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: widget.actions.map((type) {
@@ -180,7 +156,25 @@ class _MarkdownTextInputState extends State<MarkdownTextInput> {
                 }).toList(),
               ),
             ),
-          )
+          ),
+          TextFormField(
+            textInputAction: TextInputAction.newline,
+            controller: _controller,
+            maxLines: 1000,
+            textCapitalization: TextCapitalization.sentences,
+            validator: (value) => widget.validators!(value),
+            cursorColor: Theme.of(context).primaryColor,
+            textDirection: widget.textDirection,
+            decoration: InputDecoration(
+              enabledBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary)),
+              focusedBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary)),
+              hintText: widget.label,
+              hintStyle: const TextStyle(color: Color.fromRGBO(63, 61, 86, 0.5)),
+              contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+            ),
+          ),
         ],
       ),
     );
