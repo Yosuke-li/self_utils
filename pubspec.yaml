@@ -42,8 +42,9 @@ dependencies:
   back_button_interceptor: ^6.0.1 #键盘管理
   simple_animations: ^5.0.0+2
   provider: ^6.0.1 #状态管理
-  flutter_shortcuts: ^1.2.2 #app图标长按按钮
+#  flutter_shortcuts: ^1.2.2 #app图标长按按钮
   expandable: ^5.0.1
+  quick_actions: ^1.0.0
 
 
 dev_dependencies:

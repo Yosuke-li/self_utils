@@ -4,23 +4,31 @@
 // 混合使用 with 关键字，with 后面可以是 class、abstract class 和 mixin 的类型。
 // Mixins 不是多重继承，相反，它只是在多个层次结构中重用类中的代码而无需扩展它们的一种方式。
 
+import 'package:self_utils/init.dart';
+
 ///Mixin解决了无法多重继承的问题。代码复用
 
 class Person {
-  void eat() {
-    print('eat');
+  void walk() {
+    print('walk');
   }
 }
 
-mixin Dance {
+class Bird {
+  void fly() {
+    print('fly');
+  }
+}
+
+mixin Dance on Person {
   void dance() {
     print('dance');
   }
 }
 
-mixin Sing{
-  void sing() {
-    print('sing');
+mixin Eat{
+  void eat() {
+    print('eat');
   }
 }
 
@@ -30,9 +38,9 @@ mixin Sing{
 ///super 表示调用父类（Person）的方法。
 mixin Code on Person {
   @override
-  void eat() {
-    super.eat();
-    print('Code eat');
+  void walk() {
+    super.walk();
+    print('Code walk');
   }
 
   void code() {
@@ -41,14 +49,19 @@ mixin Code on Person {
 }
 
 ///注意：混合使用 with 关键字
-class A extends Person with Dance, Sing {
+class A extends Person with Eat {
 
 }
 
-class B extends Person with Code, Sing {
+class D extends Bird with Eat {
 
 }
 
-class C extends Person with Dance, Code {
+class B extends Person with Code, Eat {
 
 }
+
+// 'Code' can't be mixed onto 'Bird' because 'Bird' doesn't implement 'Person'. (Documentation)
+// class C extends Bird with Code {
+//
+// }

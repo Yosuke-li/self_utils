@@ -31,4 +31,13 @@ void main() {
     })));
     expect(i,3);
   });
+
+  test('mixin', () {
+    A a = A();
+    B b = B();
+    D d = D();
+    a.eat();
+    b.eat();
+    d.eat();
+  });
 }

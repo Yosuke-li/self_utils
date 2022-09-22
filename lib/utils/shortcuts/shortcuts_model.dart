@@ -1,4 +1,4 @@
-import 'package:flutter_shortcuts/flutter_shortcuts.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 typedef ShortCutsFunc = void Function();
 
