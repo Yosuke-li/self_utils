@@ -61,16 +61,18 @@ class PermissionHelper {
         break;
       case PermissionStatus.denied:
         if (Platform.isIOS) {
-          if (!_permissionSet.contains(checkPermission))
+          if (!_permissionSet.contains(checkPermission)) {
             gotoIOSPermissionTip(checkPermission, onCancel: onCancel);
+          }
           return false;
         }
         return await requestPermission(checkPermission,
             onCancel: onCancel, textTip: textTip);
         break;
       case PermissionStatus.restricted:
-        if (!_permissionSet.contains(checkPermission))
+        if (!_permissionSet.contains(checkPermission)) {
           gotoIOSPermissionTip(checkPermission, onCancel: onCancel);
+        }
         return false;
         break;
       default:
@@ -315,7 +317,7 @@ class PermissionHelper {
         ),
         alignment: Alignment.centerLeft,
         child: Text(
-          '开启位置服务，能更好地确定您所处的展馆',
+          '开启位置服务',
           style: TextStyle(
             color: const Color(0xff3e3e3e),
             fontSize: screenUtil.getAutoSp(43),
