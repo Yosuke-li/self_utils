@@ -283,7 +283,15 @@ class DateTimeHelper {
   ///获取聊天时间，当日显示小时当年显示月日，其他时间显示年月日
   static String? toChatTime(int time) {
     if (isItTheSameDay(time)) {
-      return datetimeFormat(time, 'HH:mm');
+      final utcTime2 = (getLocalTimeStamp() / 1000).floor();
+      final spanTime = utcTime2 - time;
+      if (spanTime < 60000 || spanTime < 0) {
+        return '现在';
+      } else if (spanTime < 3600000) {
+        return '${(spanTime / 60000).floor()}分钟前';
+      } else {
+        return datetimeFormat(time, 'HH:mm');
+      }
     } else {
       final int now = (timeToTimeStamp(getNow())).floor();
 

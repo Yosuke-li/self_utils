@@ -54,8 +54,6 @@ Future<dynamic> loadT() async {
 }
 
 void info(SendPort sendPort) async {
-  final ReceivePort receivePort = ReceivePort();
-  receivePort.close();
   Isolate.exit(sendPort, '测试exit');
 }
 
@@ -87,6 +85,7 @@ Future<void> _entry(SendPort p) async {
       final data = calculateEvenCount(message);
       p.send(data);
     } else if (message == null) {
+      commandPort.close();
       break;
     }
   }
