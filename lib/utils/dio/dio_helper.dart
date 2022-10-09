@@ -8,30 +8,38 @@ import 'package:self_utils/utils/api_exception.dart';
 import 'package:self_utils/utils/toast_utils.dart';
 
 import '../log_utils.dart';
+import 'token_interceptor.dart';
 
 class Request {
   // 配置 Dio 实例
   static final BaseOptions _options = BaseOptions(
-    baseUrl: '',
     connectTimeout: 10000,
     receiveTimeout: 3000,
+    contentType: 'application/json',
+    responseType: ResponseType.json,
   );
 
   // 创建 Dio 实例
   static final Dio _dio = Dio(_options);
 
+  // 添加拦截器
+  static void init() {
+    _dio.interceptors.clear();
+    CookieJar cookie = CookieJar();
+    _dio.interceptors.addAll([
+      CookieManager(cookie),
+      TokenInterceptor(),
+    ]);
+  }
+
   // _request 是核心函数，所有的请求都会走这里
   static Future<Response> _request<T>(String path,
-      {String? method, Map<String, dynamic>? params, data, String? token}) async {
-    CookieJar cookie = CookieJar();
-    _dio.interceptors.add(CookieManager(cookie));
-
+      {String? method,
+      Map<String, dynamic>? params,
+      data,
+      Map<String, dynamic>? header}) async {
     // restful 请求处理
-    final Map<String, dynamic> headers = <String, dynamic>{};
-    //一般情况下，未登陆前没token。
-    if (token != null && token.isNotEmpty == true) {
-      headers['Authorization'] = token;
-    }
+    final Map<String, dynamic> headers = header ?? {};
 
     //Fiddler抓包设置代理
     // if (GlobalStore.isUserFiddle == true) {
@@ -40,7 +48,7 @@ class Request {
 
     try {
       final Response response = await _dio.request(path,
-          data: data ?? Object(),
+          data: data,
           options: Options(method: method, headers: headers),
           queryParameters: params);
 
@@ -138,14 +146,14 @@ class Request {
   }
 
   static Future<Response> get<T>(String path,
-      {Map<String, dynamic>? params, String? token}) {
-    return _request(path, method: 'get', params: params, token: token);
+      {Map<String, dynamic>? params, Map<String, dynamic>? header}) {
+    return _request(path, method: 'get', params: params, header: header);
   }
 
   static Future<Response> post<T>(String path,
-      {Map<String, dynamic>? params, data, String? token}) {
+      {Map<String, dynamic>? params, data, Map<String, dynamic>? header}) {
     return _request(path,
-        method: 'post', params: params, data: data, token: token);
+        method: 'post', params: params, data: data, header: header);
   }
 
   static Future<Response> downloadFile(String resUrl, String savePath,

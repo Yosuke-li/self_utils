@@ -3,12 +3,7 @@ library utils;
 export 'global/global.dart';
 export 'global/store.dart';
 
-export 'utils/dio/auth_interceptor.dart';
-export 'utils/dio/cookie.dart';
-export 'utils/dio/dio.dart';
 export 'utils/dio/dio_helper.dart';
-export 'utils/dio/interceptor.dart';
-export 'utils/dio/request.dart';
 export 'utils/event_bus/event_util.dart';
 export 'utils/helpers/interfaces/i_test.dart';
 export 'utils/helpers/f_test.dart';
