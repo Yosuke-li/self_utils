@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
 
+/// SchedulerBinding 任务调度器
+
 enum SkeletonStatus { waitLoad, cache, loadDone }
 
 class SkeletonManager<T> {
@@ -34,9 +36,11 @@ class SkeletonManager<T> {
     _version++;
     int oldVersion = _version;
     if(_isFirst){
+      /// Frame完成之后的回调方法
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         _tryLoad();
       });
+      /// 更新
       SchedulerBinding.instance.ensureVisualUpdate();
       _isFirst=false;
       return;
