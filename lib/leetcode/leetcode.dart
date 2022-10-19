@@ -102,7 +102,7 @@ class Solution {
     return result;
   }
 
-  int largestSumAfterKNegations(List<int> nums, int k) {
+  static int largestSumAfterKNegations(List<int> nums, int k) {
     int result = 0;
 
     for (int i = 0; i < k; i++) {
@@ -114,5 +114,157 @@ class Solution {
     return result;
   }
 
+  /// toRadixString 进制转换
+  /// int.parse radix 定义进制
+  static int bitwiseComplement(int n) {
+    late int result;
+    String twoWise = n.toRadixString(2);
+    List<String> wiseList = twoWise.split('');
+    for (int i = 0; i < wiseList.length; i++) {
+      if (wiseList[i] == '1') {
+        wiseList[i] = '0';
+      } else {
+        wiseList[i] = '1';
+      }
+    }
+    String tenWise = int.parse(wiseList.join(''), radix: 2).toRadixString(10);
+    result = int.parse(tenWise);
+    return result;
+  }
 
+  /// 本地没遇到问题，但跑不过leetcode测试
+  ///
+  static bool canThreePartsEqualSum(List<int> arr) {
+    int sum = 0;
+    for (int val in arr) {
+      sum += val;
+    }
+
+    if (sum % 3 == 0) {
+      int times = 0;
+      while (times < 3) {
+        int i = 0;
+        int partSum = 0;
+        for (int j = i; j < arr.length; j++) {
+          partSum += arr[j];
+          if (times < 2) {
+            if (partSum == sum / 3) {
+              i = j;
+              times++;
+              partSum = 0;
+              continue;
+            }
+          } else if (j == arr.length - 1) {
+            if (partSum == sum / 3) {
+              i = j;
+              times++;
+              partSum = 0;
+              break;
+            } else {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /// 超出整数范围
+  static List<bool> prefixesDivBy5(List<int> nums) {
+    List<bool> result = [];
+    String numString = '';
+    for (var element in nums) {
+      numString += '$element';
+      int val = int.parse(int.parse(numString, radix: 2).toRadixString(10));
+      if (val % 5 == 0) {
+        result.add(true);
+      } else {
+        result.add(false);
+      }
+    }
+
+    return result;
+  }
+
+  /// 移位运算符
+  /// 直接计算会溢出，每次只保存余数
+  static List<bool> prefixesDivBy5Sec(List<int> nums) {
+    List<bool> result = [];
+    int val = 0;
+    for (var element in nums) {
+      print(((val << 1) + element));
+      val = ((val << 1) + element) % 5;
+      if (val == 0) {
+        result.add(true);
+      } else {
+        result.add(false);
+      }
+    }
+
+    return result;
+  }
+
+  /// 堆栈
+  static String removeOuterParentheses(String s) {
+    String result = '';
+    List<String> list = [];
+    s.split('').forEach((element) {
+      if (element == ')') {
+        list.removeLast();
+      }
+      if (list.isNotEmpty) {
+        result += element;
+      }
+      if (element == '(') {
+        list.add(element);
+      }
+    });
+    return result;
+  }
+
+  /// 数学方法 -- 直线方程
+  static bool isBoomerang(List<List<int>> points) {
+    late bool result;
+    if ((points[1][1] - points[0][1]) * (points[2][0] - points[0][0]) ==
+        (points[1][0] - points[0][0]) * (points[2][1] - points[0][1])) {
+      result = false;
+    } else {
+      result = true;
+    }
+
+    return result;
+  }
+
+  /// 排序 计算 删减 循环以上操作
+  static int lastStoneWeight(List<int> stones) {
+    int result = 0;
+    while (stones.length > 1) {
+      stones.sort((a, b) => b - a);
+      int val = stones[0] - stones[1];
+      if (val != 0) {
+        stones.add(val);
+      }
+      stones.removeRange(0, 2);
+    }
+    result = stones.isNotEmpty ? stones[0] : 0;
+    return result;
+  }
+
+  /// 堆栈
+  static String removeDuplicates(String s) {
+    String result = '';
+    List<String> list = s.split('');
+    int last = 0;
+    int first = list.length;
+    do {
+      int first = list.length;
+
+    } while(last != first);
+
+    result = list.join('');
+    return result;
+  }
 }
