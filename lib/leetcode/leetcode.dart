@@ -133,7 +133,6 @@ class Solution {
   }
 
   /// 本地没遇到问题，但跑不过leetcode测试
-  ///
   static bool canThreePartsEqualSum(List<int> arr) {
     int sum = 0;
     for (int val in arr) {
@@ -256,15 +255,155 @@ class Solution {
   /// 堆栈
   static String removeDuplicates(String s) {
     String result = '';
-    List<String> list = s.split('');
-    int last = 0;
-    int first = list.length;
-    do {
-      int first = list.length;
+    List<String> stack = [];
+    s.split('').forEach((element) {
+      /// 如果栈stack不为空，且栈stack最后一个跟element值相同，就remove掉，否则添加进堆栈上
+      if (stack.isNotEmpty == true && stack[stack.length - 1] == element) {
+        stack.removeAt(stack.length - 1);
+      } else {
+        stack.add(element);
+      }
+    });
+    result = stack.join('');
+    return result;
+  }
 
-    } while(last != first);
+  /// 数组对比（深浅拷贝）
+  /// 浅拷贝直接赋值，深拷贝使用List.from
+  /// 同样Map类型的深拷贝使用Map.from，然后copyWithList
+  static int heightChecker(List<int> heights) {
+    int result = 0;
+    List<int> newList = List.from(heights);
+    newList.sort((a, b) => a - b);
+    for (int i = 0; i < heights.length; i++) {
+      if (newList[i] != heights[i]) {
+        result++;
+      }
+    }
+    return result;
+  }
 
-    result = list.join('');
+  static List<String> findOcurrences(String text, String first, String second) {
+    List<String> result = [];
+    List<String> textList = text.split(' ');
+    int i = 0;
+    while (i < textList.length - 2) {
+      if (textList[i] == first && textList[i + 1] == second) {
+        result.add(textList[i + 2]);
+      }
+      i++;
+    }
+
+    return result;
+  }
+
+  static List<int> distributeCandies(int candies, int num_people) {
+    List<int> result = List.filled(num_people, 0);
+    int fin = candies;
+    int i = 1;
+    while (fin > 0) {
+      for (int j = 0; j < result.length; j++) {
+        result[j] += i;
+        fin -= i;
+        i++;
+        if (fin < i) {
+          i = fin;
+        }
+      }
+    }
+    return result;
+  }
+
+  /// 每次只存数组前三的值
+  static int tribonacci(int n) {
+    int result = 0;
+    List<int> sumRes = [0, 1, 1, 0];
+    for (int i = 0; i < n - 2; i++) {
+      int sum = 0;
+      sumRes.map((e) => sum += e).toList();
+      sumRes[3] = sum;
+      sumRes.removeRange(0, 1);
+      sumRes.add(0);
+    }
+    result = n > 2 ? sumRes[2] : sumRes[n];
+    return result;
+  }
+
+  /// 超出时间限制
+  static int dayOfYear(String date) {
+    int result = 0;
+    List<int> dateList = date.split('-').map((e) => int.parse(e)).toList();
+    List<int> mouth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (dateList[0] % 4 == 0) {
+      mouth[1] = 29;
+    }
+
+    for (int i = 0; i < dateList[1] - 1; i++) {
+      result += mouth[i];
+    }
+
+    result += dateList[2];
+
+    return result;
+  }
+
+  static int distanceBetweenBusStops(
+      List<int> distance, int start, int destination) {
+    int result = 0;
+    int sum = 0;
+    distance.map((e) => sum += e).toList();
+    if (start > destination) {
+      distance.getRange(destination, start).map((e) => result += e).toList();
+    } else {
+      distance.getRange(start, destination).map((e) => result += e).toList();
+    }
+
+    return min(result, sum - result);
+  }
+
+  static String dayOfTheWeek(int day, int month, int year) {
+    String result = '';
+    DateTime dateTime = DateTime(year, month, day);
+    switch (dateTime.weekday) {
+      case 1:
+        result = 'Monday';
+        break;
+      case 2:
+        result = 'Tuesday';
+        break;
+      case 3:
+        result = 'Wednesday';
+        break;
+      case 4:
+        result = 'Thursday';
+        break;
+      case 5:
+        result = 'Friday';
+        break;
+      case 6:
+        result = 'Saturday';
+        break;
+      case 7:
+        result = 'Sunday';
+        break;
+    }
+    return result;
+  }
+
+  static List<List<int>> minimumAbsDifference(List<int> arr) {
+    List<List<int>> result = [];
+    arr.sort((a, b) => a - b);
+    int miniAbs = arr[1] - arr[0];
+    for (int i = 1; i < arr.length; i++) {
+      if (arr[i] - arr[i - 1] < miniAbs) {
+        miniAbs = arr[i] - arr[i - 1];
+        result.clear();
+      }
+      if (arr[i] - arr[i - 1] == miniAbs) {
+        result.add([arr[i - 1], arr[i]]);
+      }
+    }
+
     return result;
   }
 }
