@@ -40,4 +40,9 @@ void main() {
     b.eat();
     d.eat();
   });
+
+  test('containList', () {
+    final result = ArrayHelper.containList(['0', 4], [0, 4, 8]);
+    expect(result, false);
+  });
 }

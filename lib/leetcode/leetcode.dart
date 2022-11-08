@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
+import 'package:self_utils/init.dart';
 
 class Solution {
   /// 暴力破解
@@ -403,6 +405,198 @@ class Solution {
         result.add([arr[i - 1], arr[i]]);
       }
     }
+
+    return result;
+  }
+
+  /// 第一个map记录每个数字出现的次数，第二个map记录每个次数出现的次数。然后比较
+  static bool uniqueOccurrences(List<int> arr) {
+    Map<int, dynamic> map = {};
+    for (var element in arr) {
+      if (map.containsKey(element) == true) {
+        map[element] += 1;
+      } else {
+        map[element] = 1;
+      }
+    }
+
+    Map<int, dynamic> set = {};
+    map.forEach((key, value) {
+      if (set.containsKey(value) == true) {
+        set[value]++;
+      } else {
+        set[value] = 1;
+      }
+    });
+
+    return set.length == map.length;
+  }
+
+  /// 堆栈
+  static int balanceStringSplit(String s) {
+    int result = 0;
+    List<String> arr = [];
+    for (var val in s.split('')) {
+      arr.add(val);
+      if (arr.where((element) => element == 'R').length ==
+          arr.where((element) => element == 'L').length) {
+        arr.clear();
+        result++;
+      }
+    }
+
+    return result;
+  }
+
+  /// 多维数组 rows[x] + cols[y]即为（x, y)的值
+  static int oddCells(int m, int n, List<List<int>> indices) {
+    int result = 0;
+    List<int> rows = List.filled(m, 0);
+    List<int> cols = List.filled(n, 0);
+
+    for (var val in indices) {
+      rows[val[0]]++;
+      cols[val[1]]++;
+    }
+
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        if ((rows[i] + cols[j]) & 1 != 0) {
+          result++;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /// A B Draw Pending
+  /// {1, 2, 3}      {0, 1, 2}     {(0, 0), (0, 1), (0, 2)}
+  /// {4, 5, 6}  =>  {3, 4, 5}  => {(1, 0), (1, 1), (1, 2)} => (x, y) => x*3+y = key
+  /// {7, 8, 9}      {6, 7, 8}     {(2, 0), (2, 1), (2, 2)}
+  /// 对比两个数组
+  static String tictactoe(List<List<int>> moves) {
+    List<int> a = [];
+    List<int> b = [];
+    for (int i = 0; i < moves.length; i++) {
+      int key = moves[i][0] * 3 + moves[i][1];
+      if (i & 1 == 0) {
+        a.add(key);
+      } else {
+        b.add(key);
+      }
+      a.sort((a, b) => a - b);
+      b.sort((a, b) => a - b);
+    }
+
+    List<List<int>> wins = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    for (var element in wins) {
+      if (a.length >= 3 && ArrayHelper.containList(a, element)) {
+        return 'A';
+      } else if (b.length >= 3 && ArrayHelper.containList(element, b)) {
+        return 'B';
+      }
+    }
+    return moves.length < 9 ? 'Pending' : 'Draw';
+  }
+
+  /// 双指针
+  /// [17, 18, 4, 6, 1] => [18, 6, 6, 1, -1]
+  static List<int> replaceElements(List<int> arr) {
+    List<int> result = [];
+    for (int i = 0; i < arr.length; i++) {
+      int key = 0;
+      if (i == arr.length - 1) {
+        result.add(-1);
+        break;
+      }
+      for (int j = i + 1; j < arr.length; j++) {
+        key = max(key, arr[j]);
+      }
+      result.add(key);
+    }
+
+    return result;
+  }
+
+  /// length为n, 和为0, 且值各不相同的数组
+  static List<int> sumZero(int n) {
+    List<int> result = [];
+    for (int i = 1; i <= n / 2; i++) {
+      result.add(i);
+      result.add(-i);
+    }
+    if (n & 1 != 0) {
+      result.add(0);
+    }
+    print(result);
+    return result;
+  }
+
+  static List<int> decompressRLElist(List<int> nums) {
+    List<int> result = [];
+    for (int i = 0; i < nums.length; i += 2) {
+      for (int j = 0; j < nums[i]; j++) {
+        result.add(nums[i + 1]);
+      }
+    }
+    return result;
+  }
+
+  /// 生成和为n的两个十进制不含0的数
+  static List<int> getNoZeroIntegers(int n) {
+    List<int> result = [];
+    for (int i = 1; i < n; i++) {
+      int sum = n - i;
+      if (!i.toRadixString(10).split('').contains('0') &&
+          !sum.toRadixString(10).split('').contains('0')) {
+        result = [i, (n - i)];
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  /// 排序 => 去重 => map
+  /// 超出时间限制？
+  static List<int> arrayRankTransform(List<int> arr) {
+    List<int> result = [];
+    List<int> nArr = List.from(arr);
+    nArr = ArrayHelper.uniqueInt(nArr);
+
+    /// 去重
+    nArr.sort((a, b) => a - b);
+
+    /// 排序
+    Map<int, dynamic> arrMap = {};
+    for (int key in nArr) {
+      if (arrMap.keys.contains(key) != true) {
+        arrMap[key] = nArr.indexOf(key);
+      }
+    }
+
+    for (int val in arr) {
+      result.add(arrMap[val] + 1);
+    }
+
+    return result;
+  }
+
+  ///
+  static List<int> sortByBits(List<int> arr) {
+    List<int> result = [];
+
 
     return result;
   }

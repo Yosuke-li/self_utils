@@ -245,4 +245,51 @@ void main() {
     final result = Solution.minimumAbsDifference([4, 2, 1, 3]);
     expect(result, [[1,2],[2,3],[3,4]]);
   });
+
+  test('1207', () {
+    final result = Solution.uniqueOccurrences([1,2,2,1,1,3]);
+    expect(result, true);
+  });
+
+  test('1221', () {
+    final result = Solution.balanceStringSplit('RLRRRLLRLL');
+    expect(result, 4);
+  });
+
+  test('1252', () {
+    final result = Solution.oddCells(28,
+        38,
+        [[17,16],[26,31],[19,12],[22,24],[17,28],[23,21],[27,32],[23,27],[23,33],[18,7],[4,20],[0,31],[25,33],[5,22]]);
+    expect(result, 4);
+  });
+
+  test('1275', () {
+    final result = Solution.tictactoe([[0,0],[2,0],[1,1],[2,1],[2,2]]);
+    expect(result, 'A');
+  });
+
+  test('1299', () {
+    final result = Solution.replaceElements([17]);
+    expect(result, [ -1]);
+  });
+
+  test('1304', () {
+    final result = Solution.sumZero(2);
+    expect(result, []);
+  });
+
+  test('1313', () {
+    final result = Solution.decompressRLElist([1, 2, 3, 4]);
+    expect(result, [2,4,4,4]);
+  });
+
+  test('1317', () {
+    final result = Solution.getNoZeroIntegers(11);
+    expect(result, [2, 9]);
+  });
+
+  test('1331', () {
+    final result = Solution.arrayRankTransform([37,12,28,9,100,56,80,5,12]);
+    expect(result, [5,3,4,2,8,6,7,1,3]);
+  });
 }

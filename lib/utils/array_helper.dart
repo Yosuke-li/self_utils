@@ -14,6 +14,22 @@ class ArrayHelper {
     return unique<int>(listData: list, getKey: (int item) => item);
   }
 
+  /// 对比两个数组
+  /// [1, 2, 3] 和 [2, 3] 或者 [1, 2, 3] 和 [2, 3, 1]
+  static bool containList<T>(List<T> first, List<T> sec) {
+    if (first.length == sec.first && identical(first, sec)) {
+      return true;
+    }
+    List<T> long = first.length > sec.length ? first : sec;
+    List<T> short = first.length > sec.length ? sec : first;
+    for (T key in short) {
+      if (!long.contains(key)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   //去重_泛型
   static List<T> unique<T>(
       {required List<T> listData, required dynamic Function(T value) getKey}) {
