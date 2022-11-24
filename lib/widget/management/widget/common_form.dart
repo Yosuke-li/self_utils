@@ -1,45 +1,47 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:self_utils/utils/array_helper.dart';
+import 'package:native_context_menu/native_context_menu.dart' as native;
+import 'package:self_utils/utils/lock.dart' as self_lock;
+import 'package:self_utils/utils/log_utils.dart';
 import 'package:self_utils/widget/management/common/function_util.dart';
 
 FormColumn<T> buildTextFormColumn<T>(
-    {required Widget title, required String text(T value)}) {
-  return FormColumn<T>(
-      title: title, builder: (_, T value) => Text(text(value)));
+{required Widget title, required String text(T value)}) {
+return FormColumn<T>(
+title: title, builder: (_, T value) => Text(text(value)));
 }
 
 FormColumn<T> buildButtonFormColumn<T>(
-    {required Widget title, required String text(T value), InFunc<T>? onTap}) {
-  return FormColumn<T>(
-    title: title,
-    builder: (_, T value) =>
-        ElevatedButton(
-          child: Text(text(value)),
-          onPressed: onTap == null
-              ? null
-              : () {
-            onTap(value);
-          },
-        ),
-  );
+{required Widget title, required String text(T value), InFunc<T>? onTap}) {
+return FormColumn<T>(
+title: title,
+builder: (_, T value) => ElevatedButton(
+onPressed: onTap == null
+? null
+    : () {
+onTap(value);
+},
+child: Text(text(value)),
+),
+);
 }
 
 FormColumn<T> buildIconButtonFormColumn<T>(
     {required Widget title, IconData? icon, InFunc<T>? onTap}) {
   return FormColumn<T>(
       title: title,
-      builder: (_, T value) =>
-          IconButton(
-            icon: Icon(icon),
-            onPressed: onTap == null
-                ? null
-                : () {
-              onTap(value);
-            },
-          ));
+      builder: (_, T value) => IconButton(
+        icon: Icon(icon),
+        onPressed: onTap == null
+            ? null
+            : () {
+          onTap(value);
+        },
+      ));
 }
 
 /// self methods
@@ -56,12 +58,15 @@ class FormColumn<T> {
   final Widget title;
   final double? width;
   final ColorFunc<T>? color;
+  final Widget? extraBuilder;
   final WidgetBuilderFunc<T> builder;
 
   FormColumn(
-      {required this.title, required this.builder, this.width, this.color});
-
-
+      {required this.title,
+        required this.builder,
+        this.width,
+        this.color,
+        this.extraBuilder});
 }
 
 /// 点击的回调方法[onTapFunc]
@@ -82,24 +87,31 @@ class CommonForm<T> extends StatefulWidget {
   final List<FormColumn<T>> columns;
   final List<T> values;
   final bool canDrag;
+  final bool showExtra;
   final TapCallBack<T>? onTapFunc; //点击回调
   final DragCallBack<T>? onDragFunc; //拖拽后的回调
-  final double height;
+  final double? height;
   final Color? titleColor;
   final Color? formColor;
+  final bool showSelectItem;
 
-  // final RightMenuFunc? rightMenuFunc; // 鼠标右键方法
+  /// 选中反馈
 
-  const CommonForm({Key? key,
-    required this.columns,
-    required this.values,
-    this.canDrag = false,
-    this.onDragFunc,
-    this.onTapFunc,
-    this.titleColor,
-    // this.rightMenuFunc,
-    this.formColor,
-    required this.height})
+  final RightMenuFunc? rightMenuFunc; // 鼠标右键方法
+
+  const CommonForm(
+      {Key? key,
+        required this.columns,
+        required this.values,
+        this.canDrag = false,
+        this.showExtra = false,
+        this.onDragFunc,
+        this.onTapFunc,
+        this.titleColor,
+        this.rightMenuFunc,
+        this.formColor,
+        this.showSelectItem = false,
+        this.height})
       : super(key: key);
 
   @override
@@ -117,10 +129,16 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
   ScrollController vController = ScrollController();
 
   bool shouldReact = false;
+  int onSelectHash = -1;
 
-  final StreamController<List<FormColumn<T>>> controller = StreamController<
-      List<FormColumn<T>>>();
+  ///选中item的hash值
+
+  final StreamController<List<FormColumn<T>>> controller =
+  StreamController<List<FormColumn<T>>>();
   List<FormColumn<T>> columns = <FormColumn<T>>[];
+
+  /// 拖拽锁
+  self_lock.Lock _lock = self_lock.Lock();
 
   @override
   void initState() {
@@ -132,58 +150,46 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
   @override
   void didUpdateWidget(covariant CommonForm<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget != this) {
+    if (oldWidget != widget) {
       columns = widget.columns;
       controller.sink.add(columns);
       setState(() {});
     }
   }
 
-  @override
-  void dispose() {
-    controller.close();
-    super.dispose();
-  }
-
   Widget buildTitleRow(List<FormColumn<T>> formList) {
-    return Container(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: widget.canDrag
-            ? formList
-            .map((e) =>
-            LongPressDraggable(
-                child: DragTarget<FormColumn<T>>(
-                  onAccept: (data) {
-                    final index = columns.indexOf(e);
-                    setState(() {
-                      columns.remove(data);
-                      columns.insert(index, data);
-                      controller.sink.add(columns);
-                    });
-                  },
-                  builder: (context, data, rejects) {
-                    return warpWidget(
-                        child: e.title,
-                        width: e.width,
-                        color: widget.titleColor);
-                  },
-                ),
-                data: e,
-                delay: const Duration(milliseconds: 300),
-                feedback: warpWidget(
-                    child: e.title,
-                    width: e.width,
-                    color: widget.titleColor)))
-            .toList(growable: false)
-            : formList
-            .map(
-              (e) =>
-              warpWidget(
-                  child: e.title, width: e.width, color: widget.titleColor),
-        )
-            .toList(growable: false),
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widget.canDrag
+          ? formList
+          .map((e) => LongPressDraggable(
+          data: e,
+          delay: const Duration(milliseconds: 300),
+          feedback: warpWidget(
+              child: e.title, width: e.width, color: widget.titleColor),
+          child: DragTarget<FormColumn<T>>(
+            onAccept: (data) {
+              final index = columns.indexOf(e);
+              setState(() {
+                columns.remove(data);
+                columns.insert(index, data);
+                controller.sink.add(columns);
+              });
+            },
+            builder: (context, data, rejects) {
+              return warpWidget(
+                  child: e.title,
+                  width: e.width,
+                  color: widget.titleColor);
+            },
+          )))
+          .toList(growable: false)
+          : formList
+          .map(
+            (e) => warpWidget(
+            child: e.title, width: e.width, color: widget.titleColor),
+      )
+          .toList(growable: false),
     );
   }
 
@@ -191,6 +197,13 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
   Widget buildDragTitleRow(int index) {
     return LongPressDraggable(
       data: index,
+      delay: const Duration(milliseconds: 200),
+      feedback: Container(
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.4, color: Colors.red.shade50),
+            color: Colors.red.shade50),
+        child: buildRow(ArrayHelper.get(widget.values, index) as T),
+      ),
       child: DragTarget<int>(
         onAccept: (data) {
           final temp = widget.values[data];
@@ -206,14 +219,12 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
               color: widget.formColor);
         },
       ),
-      delay: const Duration(milliseconds: 100),
-      feedback: Container(
-        decoration: BoxDecoration(
-          border: Border.all(width: 0.4, color: Colors.red),
-          color: Colors.red,
-        ),
-        child: buildRow(ArrayHelper.get(widget.values, index)!),
-      ),
+      onDragStarted: () {
+        _lock.lock();
+      },
+      onDragCompleted: () {
+        _lock.unlock();
+      },
     );
   }
 
@@ -232,20 +243,44 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
           e.position.dx + Offset.zero.dx,
           e.position.dy + Offset.zero.dy,
         );
+
+        final selectedItem = await native.showContextMenu(
+          native.ShowMenuArgs(
+            MediaQuery.of(context).devicePixelRatio,
+            position,
+            widget.rightMenuFunc?.menuItems ?? [],
+          ),
+        );
+
+        if (selectedItem != null) {
+          widget.rightMenuFunc?.onItemSelected
+              ?.call(selectedItem, widget.values.indexOf(value));
+        }
       },
       child: Container(
         decoration: BoxDecoration(color: color),
         child: GestureDetector(
           onTap: () {
-            widget.onTapFunc?.call(value);
+            if (widget.showSelectItem == true) {
+              if (onSelectHash != value.hashCode) {
+                onSelectHash = value.hashCode ?? -1;
+              } else {
+                onSelectHash = -1;
+              }
+              setState(() {});
+            }
+            if (!_lock.isUsing()) {
+              widget.onTapFunc?.call(value);
+            }
           },
           child: Row(
             children: widget.columns
-                .map((e) =>
-                warpWidget(
-                    child: e.builder(context, value),
-                    color: e.color?.call(value),
-                    width: e.width))
+                .map((e) => warpWidget(
+                child: e.builder(context, value),
+                color: value.hashCode == onSelectHash
+                    ? Colors.blue.shade50
+                    : e.color?.call(value),
+                width: e.width))
                 .toList(growable: false),
           ),
         ),
@@ -258,7 +293,7 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
       decoration: BoxDecoration(
           border: Border.all(width: 0.1, color: const Color(0xE6797979)),
           color: color),
-      height: 25,
+      height: 26,
       width: width ?? 125,
       padding: const EdgeInsets.all(4),
       alignment: Alignment.center,
@@ -279,18 +314,22 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
       children.addAll(
           widget.values.map((e) => buildRow(e, color: widget.formColor)));
     }
+    if (widget.showExtra == true) {
+      children.add(_extraRow(color: widget.formColor));
+    }
 
     return StreamBuilder<List<FormColumn<T>>>(
       stream: controller.stream,
       initialData: columns,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        return RepaintBoundary(
+        return widget.height != null
+            ? RepaintBoundary(
           child: Scrollbar(
             controller: hController,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               controller: hController,
-              child: Container(
+              child: SizedBox(
                 height: widget.height,
                 child: Column(
                   children: [
@@ -311,8 +350,49 @@ class _CommonFormState<T> extends State<CommonForm<T>> {
               ),
             ),
           ),
+        )
+            : RepaintBoundary(
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: hController,
+              child: Column(
+                children: [
+                  buildTitleRow(snapshot.data as List<FormColumn<T>>),
+                  Scrollbar(
+                      controller: vController,
+                      child: SingleChildScrollView(
+                        controller: vController,
+                        child: Column(
+                          children: children,
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
   }
+
+  Widget _extraRow({Color? color}) {
+    return Container(
+      decoration: BoxDecoration(color: color),
+      child: Row(
+        children: widget.columns
+            .map((e) => warpWidget(
+            child: e.extraBuilder ?? Container(), width: e.width))
+            .toList(growable: false),
+      ),
+    );
+  }
+}
+
+class RightMenuFunc {
+  List<native.MenuItem>? menuItems;
+  void Function(native.MenuItem item, int index)? onItemSelected;
+
+  RightMenuFunc({this.menuItems, this.onItemSelected});
 }
