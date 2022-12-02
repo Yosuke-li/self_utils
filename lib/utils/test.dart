@@ -187,7 +187,8 @@ class DemoPageState extends State<DemoPage> {
         child: Container(
           padding: MediaQuery.of(context).padding,
           color: Colors.white,
-          width: size.width,height: size.height,
+          width: size.width,
+          height: 200,
           child: Stack(
             children: <Widget>[
               ///bottom part
