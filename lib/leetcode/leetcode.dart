@@ -597,7 +597,22 @@ class Solution {
   static List<int> sortByBits(List<int> arr) {
     List<int> result = [];
 
-
     return result;
+  }
+
+  static int lengthOfLongestSubstring(String s) {
+    Map<int, int> map = {};
+    int start = 0, end = 0;
+    int maxLength = 0;
+    for (int i = 0; i < s.length; i++) {
+      int ch = s.codeUnitAt(i);
+      if (map.containsKey(ch) == true) {
+        start = max(start, map[ch]! + 1);
+      }
+      end = i;
+      map[ch] = i;
+      maxLength = max(maxLength, end - start + 1);
+    }
+    return maxLength;
   }
 }

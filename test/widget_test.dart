@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:self_utils/init.dart';
+import 'package:self_utils/utils/log_colorful.dart';
 
 void main() {
 
@@ -44,5 +45,24 @@ void main() {
   test('containList', () {
     final result = ArrayHelper.containList(['0', 4], [0, 4, 8]);
     expect(result, false);
+  });
+
+  test('a', () {
+    RegExp regex = RegExp(r'^[A-Z-]+[-A-Z]$');
+    print(regex.hasMatch('NI-AVG-NOV'));
+  });
+
+  test('log', () {
+    int? a;
+    a.log();
+  });
+
+  test('print with color', () {
+    //\x1B[35m {内容} \x1B[0m 打印带颜色
+    print('\x1B[35m 紫色hello world \x1B[0m');
+    print('\x1B[31m 红色hello world \x1B[0m');
+    print('\x1B[1;35m 紫色粗体hello world \x1B[0m');
+    print('\x1B[1m 粗体 \x1B[0m');
+    print('\x1B[4m 下划线hello world \x1B[0m');
   });
 }

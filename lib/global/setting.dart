@@ -25,3 +25,29 @@ class Setting {
   static Color tableRed = const Color(0xffD9001B);
   static Color tableLightBlue = const Color(0xff02A7F0);
 }
+
+/// 控制桌面端的[SingleChildScrollView]和[ListView]不显示滚动条
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods like buildOverscrollIndicator and buildScrollbar
+
+  @override
+  Widget buildScrollbar(BuildContext context, Widget child, ScrollableDetails details) {
+    // When modifying this function, consider modifying the implementation in
+    // the base class as well.
+    switch (axisDirectionToAxis(details.direction)) {
+      case Axis.horizontal:
+        return child;
+      case Axis.vertical:
+        switch (getPlatform(context)) {
+          case TargetPlatform.linux:
+          case TargetPlatform.macOS:
+          case TargetPlatform.windows:
+            return child;
+          case TargetPlatform.android:
+          case TargetPlatform.fuchsia:
+          case TargetPlatform.iOS:
+            return child;
+        }
+    }
+  }
+}
