@@ -40,6 +40,7 @@ class FixedColumnForm<T> extends StatefulWidget {
 /// 1 拆分list
 class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
   ScrollController hController = ScrollController();
+  ScrollController barController = ScrollController();
   ScrollController tController = ScrollController();
 
   List<FormColumn<T>> allList = [];
@@ -271,50 +272,51 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
         return RepaintBoundary(
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
-            child: Stack(
+            height: widget.height,
+            child: Row(
               children: [
-                Container(
-                  height: widget.height,
-                  margin: const EdgeInsets.only(top: 26),
-                  child: SingleChildScrollView(
-                    child: Row(
-                      children: [
-                        Column(
-                          children: fixedChild,
-                        ),
-                        Expanded(
-                          child: Scrollbar(
-                            controller: hController,
+                SizedBox(
+                  width: fixedWidth,
+                  child: Column(
+                    children: [
+                      buildTitleRow(fixedList),
+                      Expanded(
+                          child: ScrollConfiguration(
+                            behavior: MyCustomScrollBehavior(),
                             child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                              controller: tController,
+                              physics: const NeverScrollableScrollPhysics(),
+                              child: Column(
+                                children: fixedChild,
+                              ),
+                            ),
+                          )
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Scrollbar(
+                    controller: barController,
+                    child: SingleChildScrollView(
+                      controller: barController,
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        children: [
+                          buildTitleRow(normalList, canDrag: widget.canDrag),
+                          Expanded(
+                            child: SingleChildScrollView(
                               controller: hController,
                               child: Column(
                                 children: normalChild,
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  child: Row(
-                    children: [
-                      buildTitleRow(fixedList),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: tController,
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: buildTitleRow(
-                              snapshot.data as List<FormColumn<T>>,
-                              canDrag: widget.canDrag),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                )
               ],
             ),
           ),
