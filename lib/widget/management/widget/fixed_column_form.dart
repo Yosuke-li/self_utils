@@ -19,18 +19,18 @@ class FixedColumnForm<T> extends StatefulWidget {
 
   const FixedColumnForm(
       {Key? key,
-      required this.values,
-      required this.columns,
-      this.onDragFunc,
-      this.onTapFunc,
-      required this.fixedColumn,
-      this.titleColor,
-      this.canDrag = false,
-      this.height,
-      this.showExtra = false,
-      this.rightMenuFunc,
-      this.showSelectItem = false,
-      this.formColor})
+        required this.values,
+        required this.columns,
+        this.onDragFunc,
+        this.onTapFunc,
+        required this.fixedColumn,
+        this.titleColor,
+        this.canDrag = false,
+        this.height,
+        this.showExtra = false,
+        this.rightMenuFunc,
+        this.showSelectItem = false,
+        this.formColor})
       : super(key: key);
 
   @override
@@ -48,7 +48,7 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
   List<FormColumn<T>> normalList = [];
 
   final StreamController<List<FormColumn<T>>> controller =
-      StreamController<List<FormColumn<T>>>();
+  StreamController<List<FormColumn<T>>>();
 
   double fixedWidth = 0;
 
@@ -57,18 +57,22 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
 
   /// 拖拽锁
   final self_lock.Lock _lock = self_lock.Lock();
+  String side = 'right';
 
   @override
   void initState() {
     super.initState();
     init();
-    addListenScroll();
+    // addListenScroll();
   }
 
   void addListenScroll() {
     hController.addListener(() {
       tController.jumpTo(hController.offset);
     });
+    // tController.addListener(() {
+    //   hController.jumpTo(tController.offset);
+    // });
     setState(() {});
   }
 
@@ -109,35 +113,36 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: canDrag
           ? formList
-              .map((e) => LongPressDraggable(
-                  data: e,
-                  delay: const Duration(milliseconds: 300),
-                  feedback: WrapWidget(
-                      width: e.width, color: widget.titleColor, child: e.title),
-                  child: DragTarget<FormColumn<T>>(
-                    onAccept: (data) {
-                      final index = allList.indexOf(e);
-                      setState(() {
-                        allList.remove(data);
-                        allList.insert(index, data);
-                        normalList = allList.sublist(widget.fixedColumn, allList.length);
-                        controller.sink.add(normalList);
-                      });
-                    },
-                    builder: (context, data, rejects) {
-                      return WrapWidget(
-                          width: e.width,
-                          color: widget.titleColor,
-                          child: e.title);
-                    },
-                  )))
-              .toList(growable: false)
+          .map((e) => LongPressDraggable(
+          data: e,
+          delay: const Duration(milliseconds: 300),
+          feedback: WrapWidget(
+              width: e.width, color: widget.titleColor, child: e.title),
+          child: DragTarget<FormColumn<T>>(
+            onAccept: (data) {
+              final index = allList.indexOf(e);
+              setState(() {
+                allList.remove(data);
+                allList.insert(index, data);
+                normalList =
+                    allList.sublist(widget.fixedColumn, allList.length);
+                controller.sink.add(normalList);
+              });
+            },
+            builder: (context, data, rejects) {
+              return WrapWidget(
+                  width: e.width,
+                  color: widget.titleColor,
+                  child: e.title);
+            },
+          )))
+          .toList(growable: false)
           : formList
-              .map(
-                (e) => WrapWidget(
-                    width: e.width, color: widget.titleColor, child: e.title),
-              )
-              .toList(growable: false),
+          .map(
+            (e) => WrapWidget(
+            width: e.width, color: widget.titleColor, child: e.title),
+      )
+          .toList(growable: false),
     );
   }
 
@@ -188,11 +193,11 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
           child: Row(
             children: formList
                 .map((e) => WrapWidget(
-                    color: value.hashCode == onSelectHash
-                        ? Colors.blue.shade50
-                        : e.color?.call(value),
-                    width: e.width,
-                    child: e.builder(context, value)))
+                color: value.hashCode == onSelectHash
+                    ? Colors.blue.shade50
+                    : e.color?.call(value),
+                width: e.width,
+                child: e.builder(context, value)))
                 .toList(growable: false),
           ),
         ),
@@ -275,44 +280,75 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
             height: widget.height,
             child: Row(
               children: [
-                SizedBox(
-                  width: fixedWidth,
-                  child: Column(
-                    children: [
-                      buildTitleRow(fixedList),
-                      Expanded(
-                          child: ScrollConfiguration(
-                            behavior: MyCustomScrollBehavior(),
-                            child: SingleChildScrollView(
-                              controller: tController,
-                              physics: const NeverScrollableScrollPhysics(),
-                              child: Column(
-                                children: fixedChild,
+                Listener(
+                  onPointerHover: (details) {
+                    side = 'left';
+                    setState(() {});
+                  },
+                  child: SizedBox(
+                    width: fixedWidth,
+                    child: Column(
+                      children: [
+                        buildTitleRow(fixedList),
+                        Expanded(
+                            child: ScrollConfiguration(
+                              behavior: MyCustomScrollBehavior(),
+                              child: NotificationListener(
+                                onNotification: (ScrollNotification notification) {
+                                  if (side == 'left') {
+                                    hController.jumpTo(
+                                      notification.metrics.pixels,
+                                    );
+                                  }
+                                  return true;
+                                },
+                                child: SingleChildScrollView(
+                                  controller: tController,
+                                  child: Column(
+                                    children: fixedChild,
+                                  ),
+                                ),
                               ),
-                            ),
-                          )
-                      ),
-                    ],
+                            )),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: Scrollbar(
-                    controller: barController,
-                    child: SingleChildScrollView(
+                  child: Listener(
+                    onPointerHover: (details) {
+                      side = 'right';
+                      setState(() {});
+                    },
+                    child: Scrollbar(
                       controller: barController,
-                      scrollDirection: Axis.horizontal,
-                      child: Column(
-                        children: [
-                          buildTitleRow(normalList, canDrag: widget.canDrag),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              controller: hController,
-                              child: Column(
-                                children: normalChild,
+                      child: SingleChildScrollView(
+                        controller: barController,
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          children: [
+                            buildTitleRow(normalList, canDrag: widget.canDrag),
+                            Expanded(
+                              child: NotificationListener(
+                                onNotification:
+                                    (ScrollNotification notification) {
+                                  if (side == 'right') {
+                                    tController.jumpTo(
+                                      notification.metrics.pixels,
+                                    );
+                                  }
+                                  return true;
+                                },
+                                child: SingleChildScrollView(
+                                  controller: hController,
+                                  child: Column(
+                                    children: normalChild,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -325,88 +361,3 @@ class FixedColumnFormState<T> extends State<FixedColumnForm<T>> {
     );
   }
 }
-
-//
-// Widget a() {
-//   return RepaintBoundary(
-//     child: widget.height != null
-//         ? SizedBox(
-//       height: widget.height ?? 200,
-//       child: Row(
-//         children: [
-//           SizedBox(
-//             width: fixedWidth,
-//             child: Column(
-//               children: [
-//                 buildTitleRow(fixedList),
-//                 Expanded(
-//                     child: Column(
-//                       children: fixedChild,
-//                     )),
-//               ],
-//             ),
-//           ),
-//           Expanded(
-//             child: Scrollbar(
-//               controller: hController,
-//               child: SingleChildScrollView(
-//                 controller: hController,
-//                 scrollDirection: Axis.horizontal,
-//                 child: Column(
-//                   children: [
-//                     buildTitleRow(
-//                         (snapshot.data as List<FormColumn<T>>)
-//                             .sublist(
-//                             widget.fixedColumn, allList.length),
-//                         canDrag: widget.canDrag),
-//                     Expanded(
-//                         child: Column(
-//                           children: normalChild,
-//                         )),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           )
-//         ],
-//       ),
-//     )
-//         : Row(
-//       children: [
-//         SizedBox(
-//           width: fixedWidth,
-//           child: Column(
-//             children: [
-//               buildTitleRow(fixedList),
-//               Column(
-//                 children: fixedChild,
-//               ),
-//             ],
-//           ),
-//         ),
-//         Expanded(
-//           child: Scrollbar(
-//             controller: hController,
-//             child: SingleChildScrollView(
-//               controller: hController,
-//               scrollDirection: Axis.horizontal,
-//               child: Column(
-//                 children: [
-//                   buildTitleRow(
-//                       (snapshot.data
-//                       as List<FormColumn<T>>)
-//                           .sublist(widget.fixedColumn,
-//                           allList.length),
-//                       canDrag: widget.canDrag),
-//                   Column(
-//                     children: normalChild,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         )
-//       ],
-//     ),
-//   );
-// }

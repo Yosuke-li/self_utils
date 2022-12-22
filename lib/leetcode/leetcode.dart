@@ -615,4 +615,16 @@ class Solution {
     }
     return maxLength;
   }
+
+  ///
+  static bool checkIfExist(List<int> arr) {
+    var set = <int>{}; // 哈希表
+    for (var num in arr) {
+      if (set.contains(num * 2) || (num % 2 == 0 && set.contains(num ~/ 2))) {
+        return true;
+      }
+      set.add(num);
+    }
+    return false;
+  }
 }

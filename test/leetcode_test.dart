@@ -292,4 +292,9 @@ void main() {
     final result = Solution.arrayRankTransform([37,12,28,9,100,56,80,5,12]);
     expect(result, [5,3,4,2,8,6,7,1,3]);
   });
+
+  test('1346', () {
+    final result = Solution.checkIfExist([-2,0,10,-19,4,6,-8]);
+
+  });
 }
