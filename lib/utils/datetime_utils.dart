@@ -3,6 +3,10 @@ import 'package:intl/intl.dart';
 class DateTimeHelper {
   static const Duration zone = Duration(hours: 8);
 
+  static int lastStamp = 0;
+
+  static int sequence = 1;
+
   //返回两个时间戳是不是同一天(不传则和今天比)(秒,秒)
   static bool isItTheSameDay(int utcTime, {int? utcTime2}) {
     utcTime2 ??= (timeToTimeStamp(getNow())).floor();
@@ -312,6 +316,18 @@ class DateTimeHelper {
         '${sec ~/ 60} : ${sec % 60 > 9 ? sec % 60 : '0${sec % 60}'}';
 
     return result;
+  }
+
+  /// 时间戳id
+  static int getStampId() {
+    final int now = DateTimeHelper.getLocalTimeStamp();
+    if (now == lastStamp) {
+      sequence = sequence+1;
+    } else {
+      sequence = 1;
+    }
+    lastStamp = now;
+    return (now << 16) | sequence;
   }
 }
 

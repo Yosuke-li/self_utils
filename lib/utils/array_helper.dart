@@ -46,4 +46,39 @@ class ArrayHelper {
       return <T>[];
     }
   }
+
+  /// 判断数组是否相同
+  static bool listIsEqual<T>(List<T> list1, List<T> list2) {
+    if (list1.length == list2.length) {
+      for (var element in list1) {
+        if (list2.contains(element) && list1.indexOf(element) == list2.indexOf(element)) {
+
+        } else {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  /// 分组
+  static List<List<T>> groupBy<T>(
+      {required List<T> list, required dynamic Function(T value) getKey}) {
+    if (list.isNotEmpty) {
+      final List<List<T>> result = [];
+      final Map<dynamic, List<T>> maps = {
+        for (var e in list)
+          getKey(e): list
+              .where((T element) => getKey(element) == getKey(e))
+              .toList()
+      };
+      result.addAll(maps.values);
+      return result;
+    } else {
+      return [];
+    }
+  }
 }

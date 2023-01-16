@@ -65,4 +65,9 @@ void main() {
     print('\x1B[1m 粗体 \x1B[0m');
     print('\x1B[4m 下划线hello world \x1B[0m');
   });
+
+  test('salt', () {
+    final res = Encrypt.encryptToBase64('password');
+    print(res);
+  });
 }
