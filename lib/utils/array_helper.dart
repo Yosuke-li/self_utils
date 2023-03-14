@@ -81,4 +81,17 @@ class ArrayHelper {
       return [];
     }
   }
+
+  // 数组降维
+  static List<T> flatten<T>(List<dynamic> list) {
+    List<T> result = [];
+    for (var item in list) {
+      if (item is List) {
+        result.addAll(flatten(item));
+      } else {
+        result.add(item);
+      }
+    }
+    return result;
+  }
 }

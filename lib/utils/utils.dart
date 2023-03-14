@@ -8,6 +8,8 @@ import 'dart:ui' as ui show window;
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'log_utils.dart';
+
 typedef CancelCallBack = void Function();
 
 class Utils {
@@ -267,5 +269,14 @@ class Utils {
     return fractionDigits == 0
         ? int.tryParse(valueStr)
         : double.tryParse(valueStr);
+  }
+
+  static T checkTime<T>(T Function() func) {
+    var startTime = DateTime.now();
+    final result = func();
+    var endTime = DateTime.now();
+    var timeDiff = endTime.difference(startTime);
+    Log.info('方法运行时间：${timeDiff.inMicroseconds} 微秒');
+    return result;
   }
 }

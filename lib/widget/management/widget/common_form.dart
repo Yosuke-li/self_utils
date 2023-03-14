@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:self_utils/global/global.dart';
+import 'package:self_utils/global/utils_global.dart';
 import 'package:self_utils/global/setting.dart';
 import 'package:self_utils/utils/array_helper.dart';
 import 'package:native_context_menu/native_context_menu.dart' as native;

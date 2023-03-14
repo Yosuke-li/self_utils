@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:self_utils/global/global.dart';
+import 'package:self_utils/global/utils_global.dart';
 import 'package:self_utils/utils/event_bus_helper.dart';
 import 'package:self_utils/widget/animate_router.dart';
 import 'package:get/get.dart';

@@ -8,8 +8,3 @@ class EventBusUtil {
     return _eventBus;
   }
 }
-
-class PageEvent {
-  String test;
-  PageEvent(this.test);
-}

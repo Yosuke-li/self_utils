@@ -1,6 +1,6 @@
 library utils;
 
-export 'global/global.dart';
+export 'global/utils_global.dart';
 export 'global/store.dart';
 
 export 'utils/dio/dio_helper.dart';
@@ -91,3 +91,5 @@ export 'widget/text_input_lock.dart';
 export 'widget/three_d_widget.dart';
 export 'widget/video_widget.dart';
 export 'widget/window.dart';
+
+export 'generated/l10n.dart';

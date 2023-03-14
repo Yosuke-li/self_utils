@@ -3,7 +3,7 @@ import 'dart:io';
 
 
 import 'package:flutter/material.dart';
-import 'package:self_utils/global/global.dart';
+import 'package:self_utils/global/utils_global.dart';
 import 'package:self_utils/utils/event_bus_helper.dart';
 import 'package:self_utils/utils/log_utils.dart';
 

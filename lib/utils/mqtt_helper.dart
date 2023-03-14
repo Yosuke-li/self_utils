@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:self_utils/global/global.dart';
+import 'package:self_utils/global/utils_global.dart';
 import 'package:self_utils/utils/api_exception.dart';
 import 'package:self_utils/utils/event_bus_helper.dart';
 import 'package:self_utils/utils/log_utils.dart';
