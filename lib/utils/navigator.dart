@@ -1,11 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:self_utils/global/utils_global.dart';
 import 'package:self_utils/utils/event_bus_helper.dart';
 import 'package:self_utils/widget/animate_router.dart';
 import 'package:get/get.dart';
 
+// 如需继承和重写方法就不能使用静态方法
 class NavigatorUtils {
-  static Future<T?> pushWidget<T>(
+  Future<T?>? pushWidget<T>(
     BuildContext context,
     Widget widget, {
     bool replaceRoot = false,

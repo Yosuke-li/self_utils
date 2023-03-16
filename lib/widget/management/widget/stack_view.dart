@@ -77,11 +77,11 @@ class _StackViewState extends State<StackView> implements StackViewListener {
     }
 
     if (index == -1) {
-      _currentIndex = _list.length;
-      _list.add(ViewKeyWidget(key: key, child: createIfAbsent(context)));
     } else {
-      _currentIndex = index;
+      _list.removeAt(index);
     }
+    _currentIndex = _list.length;
+    _list.add(ViewKeyWidget(key: key, child: createIfAbsent(context)));
     widget.onCurrentIndexChanged?.call(_list[_currentIndex].key as ViewKey);
     _markNeedUpdate();
   }
