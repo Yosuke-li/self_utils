@@ -91,5 +91,6 @@ export 'widget/text_input_lock.dart';
 export 'widget/three_d_widget.dart';
 export 'widget/video_widget.dart';
 export 'widget/window.dart';
+export 'widget/circle_check_box.dart';
 
 export 'generated/l10n.dart';

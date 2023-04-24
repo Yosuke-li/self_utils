@@ -25,9 +25,9 @@ class FileUtils {
   ///格式必需为 /pathA/pathB/
   ///已斜杠开始,并且斜杠结尾
   static Future<File> generateRandomTempFile(
-      {String path = '/', String? fileType}) async {
+      {String path = '/', String? fileType, String? name}) async {
     String tempFilePath =
-        await generateRandomTempFilePath(path: path, fileType: fileType);
+        await generateRandomTempFilePath(path: path, fileType: fileType, name: name);
     return File(tempFilePath).create(recursive: true);
   }
 
@@ -35,7 +35,7 @@ class FileUtils {
   ///  /cache/test/xxx.png  返回示例
   ///[fileType] 例子: m4a , aac , mp3
   static Future<String> generateRandomTempFilePath(
-      {String path = '/', String? fileType}) async {
+      {String path = '/', String? fileType, String? name}) async {
     assert(path != null);
     assert(path.isNotEmpty);
     assert(path.startsWith('/'));
@@ -46,10 +46,10 @@ class FileUtils {
     for (;;) {
       if (fileType == null) {
         file =
-            File("${tempDir.path}${path}${Random().nextInt(4294967000)}");
+            File("${tempDir.path}${path}${name??Random().nextInt(4294967000)}");
       } else {
         file = File(
-            "${tempDir.path}${path}${Random().nextInt(4294967000)}.$fileType");
+            "${tempDir.path}${path}${name??Random().nextInt(4294967000)}.$fileType");
       }
 
       if (!file.existsSync()) {

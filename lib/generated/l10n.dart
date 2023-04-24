@@ -60,6 +60,16 @@ class S {
     );
   }
 
+  /// `lang setting`
+  String get langSetting {
+    return Intl.message(
+      'lang setting',
+      name: 'langSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Mine Sweeping Game!`
   String get mineSweeping {
     return Intl.message(

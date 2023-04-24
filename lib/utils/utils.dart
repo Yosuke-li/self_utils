@@ -8,6 +8,7 @@ import 'dart:ui' as ui show window;
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'datetime_utils.dart';
 import 'log_utils.dart';
 
 typedef CancelCallBack = void Function();
@@ -19,6 +20,10 @@ class Utils {
   static bool get isIOS => Platform.isIOS;
 
   static Timer? timer;
+
+  static int lastStamp = 0;
+
+  static int sequence = 1;
 
   /// 字符串转颜色
   ///
@@ -278,5 +283,17 @@ class Utils {
     var timeDiff = endTime.difference(startTime);
     Log.info('方法运行时间：${timeDiff.inMicroseconds} 微秒');
     return result;
+  }
+
+  /// 时间戳id
+  static int getStampId() {
+    final int now = DateTimeHelper.getLocalTimeStamp();
+    if (now == lastStamp) {
+      sequence = sequence+1;
+    } else {
+      sequence = 1;
+    }
+    lastStamp = now;
+    return (now << 16) | sequence;
   }
 }

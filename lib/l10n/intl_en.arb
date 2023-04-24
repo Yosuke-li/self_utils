@@ -1,6 +1,7 @@
 {
     "@@locale": "en",
     "appName": "Flutter Utils",
+    "langSetting": "lang setting",
     "mineSweeping": "Mine Sweeping Game!",
     "winTitle": "Congratulation!!",
     "winText": "You win!Time is ",

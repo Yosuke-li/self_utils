@@ -45,7 +45,7 @@ class DateTimeHelper {
       utcTime2 = utcTime2 * 1000;
     }
     final DateTime nowTime =
-    transformationIntDateToUtc8((utcTime2 / 1000).floor())!;
+        transformationIntDateToUtc8((utcTime2 / 1000).floor())!;
 
     //这里获取一个值为两个时间差(整天)用于判断整天 (取小(舍))
     int day = ((utcTime - utcTime2) / 86400000).floor();
@@ -148,16 +148,16 @@ class DateTimeHelper {
     }
     //获取当前时间戳的那天的开始时间
     final DateTime dayBeginTime =
-    DateTime.fromMillisecondsSinceEpoch(utcTime, isUtc: true);
+        DateTime.fromMillisecondsSinceEpoch(utcTime, isUtc: true);
     //获取当前是一周第几天
     final int weekDay = dayBeginTime.weekday;
     final DateTime thisWeekBeginTime =
-    dayBeginTime.add(Duration(days: -(weekDay - 1)));
+        dayBeginTime.add(Duration(days: -(weekDay - 1)));
     final DateTime thisWeekEndTime =
-    dayBeginTime.add(Duration(days: 7 - (weekDay - 1)));
+        dayBeginTime.add(Duration(days: 7 - (weekDay - 1)));
 
     final DateTime time2 =
-    DateTime.fromMillisecondsSinceEpoch(utcTime2, isUtc: true).add(zone);
+        DateTime.fromMillisecondsSinceEpoch(utcTime2, isUtc: true).add(zone);
     if (thisWeekBeginTime == time2) {
       return true;
     }
@@ -308,12 +308,17 @@ class DateTimeHelper {
     }
   }
 
-  static String secToMusicTime(int? sec) {
+  static String secToMSTime(int? sec) {
     if (sec == null) {
       return '0';
     }
-    final String result =
-        '${sec ~/ 60} : ${sec % 60 > 9 ? sec % 60 : '0${sec % 60}'}';
+    String result = '';
+    if (sec > 3600) {
+      result =
+          '${sec ~/ 3600} : ${(sec % 3600) ~/ 60} : ${(sec % 3600) % 60 > 9 ? (sec % 3600) % 60 : '0${(sec % 3600) % 60}'}';
+    } else {
+      result = '${sec ~/ 60} : ${sec % 60 > 9 ? sec % 60 : '0${sec % 60}'}';
+    }
 
     return result;
   }
@@ -322,7 +327,7 @@ class DateTimeHelper {
   static int getStampId() {
     final int now = DateTimeHelper.getLocalTimeStamp();
     if (now == lastStamp) {
-      sequence = sequence+1;
+      sequence = sequence + 1;
     } else {
       sequence = 1;
     }
@@ -330,7 +335,6 @@ class DateTimeHelper {
     return (now << 16) | sequence;
   }
 }
-
 
 extension GenerateDate on num {
   String? get getLocalTimeStamp {

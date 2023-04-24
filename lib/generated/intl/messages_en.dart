@@ -29,6 +29,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "gameOverTitle": MessageLookupByLibrary.simpleMessage("O!"),
         "gamePlay": MessageLookupByLibrary.simpleMessage("Game Difficulty"),
         "hard": MessageLookupByLibrary.simpleMessage("hard"),
+        "langSetting": MessageLookupByLibrary.simpleMessage("lang setting"),
         "mineSweeping":
             MessageLookupByLibrary.simpleMessage("Mine Sweeping Game!"),
         "normal": MessageLookupByLibrary.simpleMessage("normal"),

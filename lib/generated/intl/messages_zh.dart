@@ -28,6 +28,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "gameOverTitle": MessageLookupByLibrary.simpleMessage("喔不!"),
         "gamePlay": MessageLookupByLibrary.simpleMessage("游戏难度"),
         "hard": MessageLookupByLibrary.simpleMessage("困难"),
+        "langSetting": MessageLookupByLibrary.simpleMessage("语言设置"),
         "mineSweeping": MessageLookupByLibrary.simpleMessage("扫雷游戏"),
         "normal": MessageLookupByLibrary.simpleMessage("正常"),
         "playAgain": MessageLookupByLibrary.simpleMessage("再玩一次"),

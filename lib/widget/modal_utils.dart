@@ -30,8 +30,6 @@ class ModalUtils {
       if (dynamicBottom != null) {
         bottom = (ModalStyle style) {
           return Container(
-            padding: EdgeInsets.only(
-                top: screenUtil.adaptive(20), bottom: screenUtil.adaptive(20)),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(
                     bottom: Radius.elliptical(

@@ -1,6 +1,7 @@
 {
     "@@locale": "zh",
     "appName": "Flutter测试应用",
+    "langSetting": "语言设置",
     "mineSweeping": "扫雷游戏",
     "winTitle": "恭喜!!",
     "winText": "游戏胜利，用时为 ",
