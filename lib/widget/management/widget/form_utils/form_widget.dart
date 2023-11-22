@@ -11,15 +11,17 @@ FormColumn<T> buildTextFormColumn<T>(
 }
 
 FormColumn<T> buildButtonFormColumn<T>(
-    {required Widget title, required String Function(T value) text, InFunc<T>? onTap}) {
+    {required Widget title,
+      required String Function(T value) text,
+      InFunc<T>? onTap}) {
   return FormColumn<T>(
     title: title,
     builder: (_, T value) => ElevatedButton(
       onPressed: onTap == null
           ? null
           : () {
-              onTap(value);
-            },
+        onTap(value);
+      },
       child: Text(text(value)),
     ),
   );
@@ -30,13 +32,13 @@ FormColumn<T> buildIconButtonFormColumn<T>(
   return FormColumn<T>(
       title: title,
       builder: (_, T value) => IconButton(
-            icon: Icon(icon),
-            onPressed: onTap == null
-                ? null
-                : () {
-                    onTap(value);
-                  },
-          ));
+        icon: Icon(icon),
+        onPressed: onTap == null
+            ? null
+            : () {
+          onTap(value);
+        },
+      ));
 }
 
 /// self methods
@@ -46,24 +48,38 @@ FormColumn<T> buildIconButtonFormColumn<T>(
 /// [DragCallBack] 拖拽的回调
 typedef ColorFunc<T> = MaterialAccentColor? Function(T value);
 typedef WidgetBuilderFunc<T> = Widget Function(BuildContext context, T value);
+typedef ComparatorFunc<T> = int Function(int val, T a, T b);
 typedef ListWidgetBuilder<T> = List<Widget> Function(
     BuildContext context, T value);
 typedef TapCallBack<T> = void Function(T value);
 typedef DragCallBack<T> = void Function(T value, int index);
+typedef DragTitleCallBack<T> = void Function(List<FormColumn<T>>);
 
 class FormColumn<T> {
+  Key? key;
+  final ComparatorFunc<T>? comparator;
+  final dynamic Function(T value)? getGroupKey;
   final Widget title;
   final double? width;
   final ColorFunc<T>? color;
   final Widget? extraBuilder;
+  final void Function()? onTitleTap;
   final WidgetBuilderFunc<T> builder;
+  final bool? sort;
+  final bool? nullBox;
 
   FormColumn(
-      {required this.title,
-      required this.builder,
-      this.width,
-      this.color,
-      this.extraBuilder});
+      {this.key,
+        required this.title,
+        required this.builder,
+        this.getGroupKey,
+        this.width,
+        this.color,
+        this.onTitleTap,
+        this.extraBuilder,
+        this.comparator,
+        this.nullBox,
+        this.sort});
 }
 
 class FormChildColumn<T> {

@@ -8,12 +8,38 @@ import 'package:self_utils/utils/array_helper.dart';
 import 'package:native_context_menu/native_context_menu.dart' as native;
 import 'package:self_utils/utils/lock.dart' as self_lock;
 import 'package:self_utils/utils/log_utils.dart';
+import 'package:self_utils/utils/screen.dart';
 import 'package:self_utils/widget/management/common/function_util.dart';
 
 part 'form_utils/_child_row.dart';
+
 part 'form_utils/form_widget.dart';
+
 part 'form_utils/_row_widget.dart';
+
 part 'fixed_column_form.dart';
+
+part 'group_common_form.dart';
+
+/// 排序方法
+enum SortType {
+  reverse,
+  order,
+  normal,
+}
+
+extension SortTxt on SortType {
+  String get enumToString {
+    switch (this) {
+      case SortType.order:
+        return '顺序';
+      case SortType.reverse:
+        return '逆序';
+      case SortType.normal:
+        return '正常';
+    }
+  }
+}
 
 /// 点击的回调方法[onTapFunc]
 ///
@@ -40,9 +66,9 @@ class CommonForm<T, D> extends StatefulWidget {
   final List<D> Function(T value)? childValues;
   final bool canDrag;
   final bool showExtra;
-  final int fixedColumn; //固定前几列
-  final TapCallBack<T>? onTapFunc; //点击回调
+  final TapCallBack<T?>? onTapFunc; //点击回调
   final DragCallBack<T>? onDragFunc; //拖拽后的回调
+  final DragTitleCallBack<T>? onDragTitleFunc; //拖拽表格标题后的回调
   final double? height;
   final Color? titleColor;
   final Color? formColor;
@@ -54,20 +80,20 @@ class CommonForm<T, D> extends StatefulWidget {
 
   const CommonForm(
       {Key? key,
-      required this.columns,
-      required this.values,
-      this.childValues,
-      this.canDrag = false,
-      this.showExtra = false,
-      this.onDragFunc,
-      this.fixedColumn = 0,
-      this.childWidget,
-      this.onTapFunc,
-      this.titleColor,
-      this.rightMenuFunc,
-      this.formColor,
-      this.showSelectItem = false,
-      this.height})
+        required this.columns,
+        required this.values,
+        this.childValues,
+        this.canDrag = false,
+        this.showExtra = false,
+        this.onDragFunc,
+        this.onDragTitleFunc,
+        this.childWidget,
+        this.onTapFunc,
+        this.titleColor,
+        this.rightMenuFunc,
+        this.formColor,
+        this.showSelectItem = false,
+        this.height})
       : super(key: key);
 
   @override
@@ -80,19 +106,22 @@ class CommonForm<T, D> extends StatefulWidget {
 /// 并通过widget生态的[didUpdateWidget]进行更新，使用[RepaintBoundary]优化组件
 ///
 
-class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
+class _CommonFormState<T, D> extends State<CommonForm<T, D>>
+    with WidgetsBindingObserver {
   ScrollController hController = ScrollController();
   ScrollController vController = ScrollController();
 
   bool shouldReact = false;
   int onSelectHash = -1;
-  List<int> hashcodes = [];
+  int onHoverHash = -1;
 
   ///选中item的hash值
+  List<int> hashcodes = [];
 
   final StreamController<List<FormColumn<T>>> controller =
-      StreamController<List<FormColumn<T>>>();
+  StreamController<List<FormColumn<T>>>();
   List<FormColumn<T>> columns = <FormColumn<T>>[];
+  List<T> values = [];
 
   /// 拖拽锁
   final self_lock.Lock _lock = self_lock.Lock();
@@ -100,10 +129,21 @@ class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
   /// 子表
   bool isShowChild = false;
 
+  /// 排序
+  SortType sortType = SortType.normal;
+  FormColumn<T>? sortE;
+  String sortName = '';
+
   @override
   void initState() {
     super.initState();
     columns = widget.columns;
+    values.clear();
+    values.addAll(widget.values);
+    if (sortE != null) {
+      changeSort(sortE!);
+    }
+    WidgetsBinding.instance.addObserver(this);
     setState(() {});
   }
 
@@ -112,46 +152,118 @@ class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget != widget) {
       columns = widget.columns;
+      values = widget.values;
+      if (sortE != null) {
+        changeSort(sortE!);
+      }
       controller.sink.add(columns);
       setState(() {});
     }
   }
 
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    if (ScreenUtil.checkNeedUpdate()) {
+      setState(() {});
+    }
+  }
+
+  void changeSort(FormColumn<T> e) {
+    if (sortType == SortType.order) {
+      values.sort((a, b) => e.comparator!(1, a, b));
+    } else if (sortType == SortType.reverse) {
+      values.sort((a, b) => e.comparator!(0, a, b));
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
   Widget buildTitleRow(List<FormColumn<T>> formList) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: widget.canDrag
           ? formList
-              .map((e) => LongPressDraggable(
-                  data: e,
-                  delay: const Duration(milliseconds: 300),
-                  feedback: WrapWidget(
-                      width: e.width, color: widget.titleColor,
-                      child: e.title),
-                  child: DragTarget<FormColumn<T>>(
-                    onAccept: (data) {
-                      final index = columns.indexOf(e);
-                      setState(() {
-                        columns.remove(data);
-                        columns.insert(index, data);
-                        controller.sink.add(columns);
-                      });
-                    },
-                    builder: (context, data, rejects) {
-                      return WrapWidget(
-                          child: e.title,
-                          width: e.width,
-                          color: widget.titleColor);
-                    },
-                  )))
-              .toList(growable: false)
+          .map((e) => LongPressDraggable(
+          data: e,
+          delay: const Duration(milliseconds: 300),
+          feedback: WrapWidget(
+              width: e.width, color: widget.titleColor, child: e.title),
+          child: DragTarget<FormColumn<T>>(
+            onAccept: (data) {
+              final index = columns.indexOf(e);
+              setState(() {
+                columns.remove(data);
+                columns.insert(index, data);
+                controller.sink.add(columns);
+              });
+              widget.onDragTitleFunc?.call(columns);
+            },
+            builder: (context, data, rejects) {
+              return GestureDetector(
+                onTap: e.onTitleTap != null
+                    ? () {
+                  e.onTitleTap!.call();
+                }
+                    : e.comparator != null
+                    ? () {
+                  if ((sortType == SortType.normal &&
+                      sortName == '') ||
+                      sortName !=
+                          '${e.comparator.hashCode}') {
+                    sortE = e;
+                    sortType = SortType.order;
+                    values.sort(
+                            (a, b) => e.comparator!(1, a, b));
+                    sortName = '${e.comparator.hashCode}';
+                  } else if (sortType == SortType.order &&
+                      sortName ==
+                          '${e.comparator.hashCode}') {
+                    sortType = SortType.reverse;
+                    values.sort(
+                            (a, b) => e.comparator!(0, a, b));
+                  } else {
+                    sortType = SortType.normal;
+                    sortName = '';
+                    sortE = null;
+                    values.clear();
+                    values.addAll(widget.values);
+                  }
+                  setState(() {});
+                }
+                    : null,
+                child: WrapWidget(
+                    width: e.width,
+                    color: widget.titleColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        e.title,
+                        ((sortType == SortType.normal &&
+                            sortName == '') ||
+                            sortName != '${e.comparator.hashCode}')
+                            ? Container()
+                            : (sortType == SortType.order &&
+                            sortName ==
+                                '${e.comparator.hashCode}')
+                            ? const Icon(
+                            Icons.arrow_drop_down_outlined)
+                            : const Icon(Icons.arrow_drop_up),
+                      ],
+                    )),
+              );
+            },
+          )))
+          .toList(growable: false)
           : formList
-              .map(
-                (e) => WrapWidget(
-                    width: e.width, color: widget.titleColor,
-                    child: e.title),
-              )
-              .toList(growable: false),
+          .map(
+            (e) => WrapWidget(
+            width: e.width, color: widget.titleColor, child: e.title),
+      )
+          .toList(growable: false),
     );
   }
 
@@ -164,20 +276,20 @@ class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
         decoration: BoxDecoration(
             border: Border.all(width: 0.4, color: Colors.red.shade50),
             color: Colors.red.shade50),
-        child: buildRow(ArrayHelper.get(widget.values, index) as T),
+        child: buildRow(ArrayHelper.get(values, index) as T),
       ),
       child: DragTarget<int>(
         onAccept: (data) {
-          final temp = widget.values[data];
+          final temp = values[data];
           setState(() {
-            widget.values.remove(temp);
-            widget.values.insert(index, temp);
+            values.remove(temp);
+            values.insert(index, temp);
           });
           widget.onDragFunc?.call(temp, index);
         },
         //绘制widget
         builder: (context, data, rejects) {
-          return buildRow(ArrayHelper.get(widget.values, index)!,
+          return buildRow(ArrayHelper.get(values, index)!,
               color: widget.formColor);
         },
       ),
@@ -220,62 +332,101 @@ class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
 
         if (selectedItem != null) {
           widget.rightMenuFunc?.onItemSelected
-              ?.call(selectedItem, widget.values.indexOf(value));
+              ?.call(selectedItem, values.indexOf(value));
         }
       },
-      child: Container(
-        decoration: BoxDecoration(color: color),
-        child: GestureDetector(
-          onTap: () {
-            if (onSelectHash != value.hashCode) {
-              onSelectHash = value.hashCode ?? -1;
-            } else {
-              onSelectHash = -1;
-            }
-            if (!_lock.isUsing()) {
-              widget.onTapFunc?.call(value);
-            }
-            if (childValues.isNotEmpty && widget.childWidget != null) {
-              if (!hashcodes.contains(value.hashCode)) {
-                hashcodes.add(value.hashCode);
-              } else {
-                hashcodes.remove(value.hashCode);
-              }
+      child: RepaintBoundary(
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (event) {
+            if (onHoverHash != value.hashCode) {
+              onHoverHash = value.hashCode ?? -1;
             }
             setState(() {});
           },
-          child: widget.childWidget != null
-              ? Column(
-                  children: [
-                    Row(
-                      children: widget.columns
-                          .map((e) => WrapWidget(
-                              child: e.builder(context, value),
-                              color: widget.showSelectItem == true &&
-                                      value.hashCode == onSelectHash
-                                  ? Colors.blue.shade50
-                                  : e.color?.call(value),
-                              width: e.width))
-                          .toList(growable: false),
+          onExit: (event) {
+            if (onHoverHash == value.hashCode) {
+              onHoverHash = -1;
+            }
+            setState(() {});
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: value.hashCode == onSelectHash || value.hashCode == onHoverHash ? Colors.blue.shade50 : color,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                if (onSelectHash != value.hashCode) {
+                  onSelectHash = value.hashCode ?? -1;
+                } else {
+                  onSelectHash = -1;
+                }
+                if (!_lock.isUsing()) {
+                  widget.onTapFunc?.call(onSelectHash != -1 ? value : null);
+                }
+                if (childValues.isNotEmpty && widget.childWidget != null) {
+                  if (!hashcodes.contains(value.hashCode)) {
+                    hashcodes.add(value.hashCode);
+                  } else {
+                    hashcodes.remove(value.hashCode);
+                  }
+                }
+                setState(() {});
+              },
+              child: widget.childWidget != null
+                  ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: widget.columns
+                        .map((e) => WrapWidget(
+                        color: e.color?.call(value),
+                        width: e.width,
+                        child: widget.columns.indexOf(e) == 0
+                            ? Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.center,
+                          crossAxisAlignment:
+                          CrossAxisAlignment.center,
+                          children: [
+                            hashcodes.contains(value.hashCode)
+                                ? const Icon(
+                              Icons.remove,
+                              size: 14,
+                              color: Color(0xe5999999),
+                            )
+                                : const Icon(
+                              Icons.add_box_outlined,
+                              size: 14,
+                              color: Color(0xe5999999),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            e.builder(context, value),
+                          ],
+                        )
+                            : e.builder(context, value)))
+                        .toList(growable: false),
+                  ),
+                  if (hashcodes.contains(value.hashCode))
+                    _ChildWidget<D>(
+                      key: Key(value.hashCode.toString()),
+                      children: widget.childWidget!,
+                      values: childValues,
                     ),
-                    if (hashcodes.contains(value.hashCode))
-                      _ChildWidget<D>(
-                        key: Key(value.hashCode.toString()),
-                        children: widget.childWidget!,
-                        values: childValues,
-                      ),
-                  ],
-                )
-              : Row(
-                  children: widget.columns
-                      .map((e) => WrapWidget(
-                          color: value.hashCode == onSelectHash
-                              ? Colors.blue.shade50
-                              : e.color?.call(value),
-                          width: e.width,
-                          child: e.builder(context, value)))
-                      .toList(growable: false),
-                ),
+                ],
+              )
+                  : Row(
+                children: widget.columns
+                    .map((e) => WrapWidget(
+                    color: e.color?.call(value),
+                    width: e.width,
+                    child: e.builder(context, value)))
+                    .toList(growable: false),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -285,15 +436,17 @@ class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
   Widget build(BuildContext context) {
     final List<Widget> children = <Widget>[];
     if (widget.canDrag == true) {
-      for (int x = 0; x < widget.values.length; x++) {
+      for (int x = 0; x < values.length; x++) {
         children.add(buildDragRow(x));
       }
     } else {
-      children.addAll(
-          widget.values.map((e) => buildRow(e, color: widget.formColor)));
+      children.addAll(values.map((e) => buildRow(e, color: widget.formColor)));
     }
     if (widget.showExtra == true) {
-      children.add(ExtraRow<T>(color: widget.formColor, columns: widget.columns,));
+      children.add(ExtraRow<T>(
+        color: widget.formColor,
+        columns: widget.columns,
+      ));
     }
 
     return StreamBuilder<List<FormColumn<T>>>(
@@ -302,56 +455,58 @@ class _CommonFormState<T, D> extends State<CommonForm<T, D>> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return widget.height != null
             ? RepaintBoundary(
-                child: Scrollbar(
-                  controller: hController,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    controller: hController,
-                    child: SizedBox(
-                      height: widget.height,
-                      child: Column(
-                        children: [
-                          buildTitleRow(snapshot.data as List<FormColumn<T>>),
-                          Expanded(
-                            child: Scrollbar(
-                              controller: vController,
-                              child: SingleChildScrollView(
-                                controller: vController,
-                                child: Column(
-                                  children: children,
-                                ),
-                              ),
-                            ),
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: hController,
+              child: SizedBox(
+                height: widget.height,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    buildTitleRow(snapshot.data as List<FormColumn<T>>),
+                    Expanded(
+                      child: Scrollbar(
+                        controller: vController,
+                        child: SingleChildScrollView(
+                          controller: vController,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: children,
                           ),
-                        ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        )
+            : RepaintBoundary(
+          child: Scrollbar(
+            controller: hController,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: hController,
+              child: Column(
+                children: [
+                  buildTitleRow(snapshot.data as List<FormColumn<T>>),
+                  Scrollbar(
+                    controller: vController,
+                    child: SingleChildScrollView(
+                      controller: vController,
+                      child: Column(
+                        children: children,
                       ),
                     ),
                   ),
-                ),
-              )
-            : RepaintBoundary(
-                child: Scrollbar(
-                  controller: hController,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    controller: hController,
-                    child: Column(
-                      children: [
-                        buildTitleRow(snapshot.data as List<FormColumn<T>>),
-                        Scrollbar(
-                          controller: vController,
-                          child: SingleChildScrollView(
-                            controller: vController,
-                            child: Column(
-                              children: children,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }

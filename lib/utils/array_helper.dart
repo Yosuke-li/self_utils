@@ -51,8 +51,8 @@ class ArrayHelper {
   static bool listIsEqual<T>(List<T> list1, List<T> list2) {
     if (list1.length == list2.length) {
       for (var element in list1) {
-        if (list2.contains(element) && list1.indexOf(element) == list2.indexOf(element)) {
-
+        if (list2.contains(element) &&
+            list1.indexOf(element) == list2.indexOf(element)) {
         } else {
           return false;
         }
@@ -63,7 +63,6 @@ class ArrayHelper {
     }
   }
 
-
   /// 分组
   static List<List<T>> groupBy<T>(
       {required List<T> list, required dynamic Function(T value) getKey}) {
@@ -71,9 +70,8 @@ class ArrayHelper {
       final List<List<T>> result = [];
       final Map<dynamic, List<T>> maps = {
         for (var e in list)
-          getKey(e): list
-              .where((T element) => getKey(element) == getKey(e))
-              .toList()
+          getKey(e):
+              list.where((T element) => getKey(element) == getKey(e)).toList()
       };
       result.addAll(maps.values);
       return result;
@@ -94,4 +92,33 @@ class ArrayHelper {
     }
     return result;
   }
+
+  /// 多重分组
+  static GroupingResult<T> groupByMultiple<T>(
+    List<T> items,
+    List<Function(T)> groupByFunctions,
+  ) {
+    final root = GroupingResult<T>();
+
+    for (var item in items) {
+      var currentGroup = root;
+      for (var groupByFunction in groupByFunctions) {
+        final groupKey = groupByFunction(item);
+        currentGroup.subGroups[groupKey] ??= GroupingResult<T>();
+        currentGroup = currentGroup.subGroups[groupKey]!;
+      }
+      currentGroup.items.add(item);
+    }
+
+    return root;
+  }
+}
+
+class GroupingResult<T> {
+  final Map<dynamic, GroupingResult<T>> subGroups;
+  final List<T> items;
+
+  GroupingResult()
+      : subGroups = {},
+        items = [];
 }

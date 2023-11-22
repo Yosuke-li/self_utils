@@ -334,6 +334,14 @@ class DateTimeHelper {
     lastStamp = now;
     return (now << 16) | sequence;
   }
+
+  //将时间戳格式化(这里的时间是后端服务器的13位数时间戳)
+  static String? millDatetimeFormat(int date, String type) {
+    if (date == 0) {
+      return null;
+    }
+    return DateFormat(type).format(DateTime.fromMillisecondsSinceEpoch(date).toUtc().add(zone));
+  }
 }
 
 extension GenerateDate on num {

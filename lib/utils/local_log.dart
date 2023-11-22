@@ -32,9 +32,14 @@ class LocalLog {
     });
   }
 
+  static Future<String> getLogInfo() async {
+    final File file = await _getDocument();
+    return await file.readAsString();
+  }
+
   static Future<void> _setLocalLog() async {
     final File file = await _getDocument();
-    if ((file.readAsBytesSync().lengthInBytes / 1024 / 1024) < 50) {
+    if ((file.readAsBytesSync().lengthInBytes / 1024 / 1024) < 5) {
       final String a = await file.readAsString();
       if (a.isNotEmpty == true) {
         _log = '$a$_log';
@@ -42,5 +47,10 @@ class LocalLog {
     }
     await file.writeAsString(_log);
     _log = '';
+  }
+
+  static Future<void> clear() async {
+    final File file = await _getDocument();
+    await file.writeAsString('');
   }
 }

@@ -94,3 +94,5 @@ export 'widget/window.dart';
 export 'widget/circle_check_box.dart';
 
 export 'generated/l10n.dart';
+export 'package:image_gallery_saver/image_gallery_saver.dart';
+export 'package:path_provider/path_provider.dart';

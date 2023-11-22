@@ -33,7 +33,7 @@ dependencies:
   cookie_jar: ^3.0.1 #cookie
   dio_cookie_manager: ^2.0.0
   shared_preferences: ^2.0.5 #key-value存储
-  tabbed_view: ^1.1.0+1 #tab组件
+  tabbed_view: 1.16.0+1 #tab组件
   multi_split_view: ^1.5.0 #doking
   video_player: ^2.4.4 #视频播放
   orientation: ^1.1.0

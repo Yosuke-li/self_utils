@@ -296,4 +296,33 @@ class Utils {
     lastStamp = now;
     return (now << 16) | sequence;
   }
+
+
+  // 货币格式化
+  static String formatPriceWithComma(String price) {
+    final bool isNegative = price.startsWith('-');
+    final int commaIndex = price.indexOf('.');
+    String decimalPart = "";
+    if (commaIndex != -1) {
+      decimalPart = price.substring(commaIndex); // Extract decimal part if exists
+      price = price.substring(0, commaIndex);
+    }
+    final List<String> reversedDigits = price.split('').reversed.toList();
+    if (isNegative) {
+      reversedDigits.removeWhere((element) => element == '-');
+    }
+    final StringBuffer result = StringBuffer();
+
+    for (int i = 0; i < reversedDigits.length; i++) {
+      result.write(reversedDigits[i]);
+      if ((i + 1) % 3 == 0 && (i + 1) != reversedDigits.length) {
+        result.write(',');
+      }
+    }
+    if (isNegative) {
+      return '-${result.toString().split('').reversed.join('')}$decimalPart';
+    } else {
+      return result.toString().split('').reversed.join('') + decimalPart;
+    }
+  }
 }
