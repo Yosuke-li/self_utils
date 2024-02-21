@@ -81,7 +81,6 @@ class _OverlayFieldState<T> extends State<OverlayField<T>> {
             elevation: 4,
             child: RepaintBoundary(
               child: Scrollbar(
-                isAlwaysShown: true,
                 child: Container(
                   height: widget.maxHeight,
                   child: ListView(

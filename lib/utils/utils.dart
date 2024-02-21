@@ -235,10 +235,9 @@ class Utils {
   /// 状态栏状态
   ///
   /// [enable] true为显示；false为隐藏
-  ///
+  /// todo 待测试
   static void statusBarEnable(bool enable) {
-    SystemChrome.setEnabledSystemUIOverlays(
-        enable ? SystemUiOverlay.values : []);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   /// 是否是空字符串

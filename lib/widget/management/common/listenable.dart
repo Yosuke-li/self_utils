@@ -4,6 +4,10 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+/// [LinkedListEntry]是flutter里的一个抽象基类 用于表示双向链表中的元素。
+/// 所有链表元素都必须扩展此类，
+/// 该类提供了将元素链接在一起的内部链接以及当前元素所属链接列表的引用。
+
 class _ListenerEntry<T> extends LinkedListEntry<_ListenerEntry<T>> {
   _ListenerEntry(this.listener);
   final T listener;

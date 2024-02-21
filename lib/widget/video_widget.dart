@@ -8,7 +8,6 @@ import 'package:self_utils/utils/log_utils.dart';
 import 'package:self_utils/utils/screen.dart';
 import 'package:self_utils/utils/toast_utils.dart';
 import 'package:self_utils/utils/utils.dart';
-import 'package:orientation/orientation.dart';
 import 'package:video_player/video_player.dart'; // 引入官方插件
 
 class VideoPlayerPage extends StatefulWidget {
@@ -548,9 +547,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
     setState(() {
       if (_isFullScreen) {
         // 如果是全屏就切换竖屏
-        OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+
       } else {
-        OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
+
       }
       _startPlayControlTimer(); // 操作完控件开始计时隐藏
     });

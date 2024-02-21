@@ -43,7 +43,7 @@ class _FloatBoxState extends State<FloatBox> {
       data: Theme.of(context).copyWith(
         highlightColor: Colors.transparent,
         appBarTheme: AppBarTheme.of(context).copyWith(
-          brightness: Brightness.dark,
+          
         ),
       ),
       child: Positioned(

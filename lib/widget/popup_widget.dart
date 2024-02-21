@@ -454,3 +454,50 @@ class PopupToastRoute<T> extends PopupRoute<T> {
   @override
   Duration get transitionDuration => _duration;
 }
+
+
+class PopupTextAndExText extends StatefulWidget {
+  final String showText;
+  final Widget builderWidget;
+
+  const PopupTextAndExText({
+    required this.showText,
+    required this.builderWidget,
+    super.key,
+  });
+
+  @override
+  State<PopupTextAndExText> createState() => _PopupTextAndExTextState();
+}
+
+class _PopupTextAndExTextState extends State<PopupTextAndExText> {
+  late GlobalKey _textKey ;
+
+  @override
+  void initState() {
+    super.initState();
+    _textKey = GlobalKey<_PopupTextAndExTextState>();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
+      child: GestureDetector(
+        key: _textKey,
+        onTap: () {
+          PopupToastWindow.showPopWindow(
+            context,
+            widget.showText,
+            _textKey,
+            spaceMargin: 0,
+            canWrap: true,
+            width: 300,
+          );
+        },
+        child: widget.builderWidget,
+      ),
+    );
+  }
+}

@@ -323,18 +323,6 @@ class DateTimeHelper {
     return result;
   }
 
-  /// 时间戳id
-  static int getStampId() {
-    final int now = DateTimeHelper.getLocalTimeStamp();
-    if (now == lastStamp) {
-      sequence = sequence + 1;
-    } else {
-      sequence = 1;
-    }
-    lastStamp = now;
-    return (now << 16) | sequence;
-  }
-
   //将时间戳格式化(这里的时间是后端服务器的13位数时间戳)
   static String? millDatetimeFormat(int date, String type) {
     if (date == 0) {
